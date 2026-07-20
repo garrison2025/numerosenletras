@@ -171,6 +171,9 @@ export default function CookieBanner() {
                   </div>
                   <button
                     type="button"
+                    role="switch"
+                    aria-checked={preferences.analytics}
+                    aria-label="Permitir métricas y estadísticas de Google Analytics"
                     onClick={() => setPreferences(p => ({ ...p, analytics: !p.analytics }))}
                     className={`w-10 h-6 rounded-full transition-all flex items-center px-0.5 border cursor-pointer ${
                       preferences.analytics
@@ -194,6 +197,9 @@ export default function CookieBanner() {
                   </div>
                   <button
                     type="button"
+                    role="switch"
+                    aria-checked={preferences.ads}
+                    aria-label="Permitir cookies de publicidad personalizada de Google AdSense"
                     onClick={() => setPreferences(p => ({ ...p, ads: !p.ads }))}
                     className={`w-10 h-6 rounded-full transition-all flex items-center px-0.5 border cursor-pointer ${
                       preferences.ads

@@ -681,6 +681,9 @@ export default function HomeConverter({ initialNumber, onNavigate }: { initialNu
               <div className="flex items-center space-x-2">
                 <button
                   type="button"
+                  role="switch"
+                  aria-checked={isCurrencyMode}
+                  aria-label="Alternar modo de conversión de moneda"
                   onClick={() => {
                     const nextVal = !isCurrencyMode;
                     setIsCurrencyMode(nextVal);

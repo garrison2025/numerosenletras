@@ -1,0 +1,14 @@
+# numerosenletras.org
+
+> Un conversor didáctico y gratuito de números a letras en español de acuerdo con las normativas de la RAE (Real Academia Española).
+
+Esta herramienta está diseñada para ayudar a estudiantes, profesores, contadores y público en general a convertir cifras numéricas en palabras legibles, formatear divisas de países hispanohablantes (México, Colombia, España, etc.), y explorar fuentes creativas como letras burbuja o letras aesthetic.
+
+## Recursos Principales
+
+- [Página de Inicio](https://numerosenletras.org/) - Conversor interactivo de números a letras con soporte de divisas y modo decimal.
+- [Generador de Letras de Burbuja](https://numerosenletras.org/letras-burbuja) - Herramienta para convertir texto estándar en fuentes circulares y redondas para redes sociales.
+- [Blog de Ortografía](https://numerosenletras.org/blog) - Artículos educativos sobre la correcta escritura de números, finanzas personales y tipografía estética.
+- [Quiénes Somos](https://numerosenletras.org/quienes-somos) - Información sobre la misión, valores y el equipo detrás del proyecto.
+- [Términos de Servicio](https://numerosenletras.org/terminos-de-servicio) - Condiciones de uso de la plataforma.
+- [Política de Privacidad](https://numerosenletras.org/politica-de-privacidad) - Gestión de cookies y protección de datos.
