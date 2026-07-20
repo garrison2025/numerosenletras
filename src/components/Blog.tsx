@@ -23,9 +23,9 @@ import {
 import { convertNumberToLetters } from "../utils/numberToLetters";
 import { AESTHETIC_FONTS } from "../utils/fontGenerators";
 
-import blogNumerosLetras from "../assets/images/blog_numeros_letras_1784280097747.jpg";
-import blogLetrasBurbuja from "../assets/images/blog_letras_burbuja_1784280113268.jpg";
-import blogLetrasAesthetic from "../assets/images/blog_letras_aesthetic_1784280122865.jpg";
+import blogNumerosLetras from "../assets/images/blog_numeros_letras.webp";
+import blogLetrasBurbuja from "../assets/images/blog_letras_burbuja.webp";
+import blogLetrasAesthetic from "../assets/images/blog_letras_aesthetic.webp";
 
 export interface BlogPost {
   id: string;
@@ -900,7 +900,9 @@ export default function Blog({ onNavigate }: { onNavigate: (path: string) => voi
                   src={selectedPost.image} 
                   alt={selectedPost.title} 
                   title={selectedPost.title}
-                  loading="lazy"
+                  loading="eager"
+                  width="1200"
+                  height="514"
                   referrerPolicy="no-referrer"
                   className="w-full h-full object-cover"
                 />
@@ -1060,6 +1062,8 @@ export default function Blog({ onNavigate }: { onNavigate: (path: string) => voi
                         alt={post.title} 
                         title={post.title}
                         loading="lazy"
+                        width="400"
+                        height="225"
                         referrerPolicy="no-referrer"
                         className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-500 cursor-pointer"
                         onClick={() => handlePostClick(post)}

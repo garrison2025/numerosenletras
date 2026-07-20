@@ -9,9 +9,9 @@ import { AboutUs, PrivacyPolicy, TermsOfService, ContactPage } from "./component
 import CookieBanner from "./components/CookieBanner";
 import Blog, { BLOG_POSTS } from "./components/Blog";
 import InterlinkingMatrix from "./components/InterlinkingMatrix";
-import blogNumerosLetras from "./assets/images/blog_numeros_letras_1784280097747.jpg";
-import blogLetrasBurbuja from "./assets/images/blog_letras_burbuja_1784280113268.jpg";
-import blogLetrasAesthetic from "./assets/images/blog_letras_aesthetic_1784280122865.jpg";
+import blogNumerosLetras from "./assets/images/blog_numeros_letras.webp";
+import blogLetrasBurbuja from "./assets/images/blog_letras_burbuja.webp";
+import blogLetrasAesthetic from "./assets/images/blog_letras_aesthetic.webp";
 import { motion, AnimatePresence } from "motion/react";
 import { 
   Heart, 
