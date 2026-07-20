@@ -1,0 +1,25 @@
+---
+import Layout from '../layouts/Layout.astro';
+import BubbleLetters from '../components/BubbleLetters';
+
+const title = "Letras Burbuja Ⓑⓤⓡⓑⓤⓙⓐ | Fuentes Circulares para Copiar y Pegar";
+const description = "Generador de fuentes de burbuja y letras con círculos. Convierte tu texto ordinario en elegantes tipografías esféricas al instante de forma gratuita.";
+const keywords = "letras burbuja, letras burbuja copiar y pegar, fuentes circulares, letras con circulos, generador de letras burbuja";
+
+const schemaData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Letras Burbuja - Fuentes Circulares",
+  "url": "https://numerosenletras.org/letras-burbuja",
+  "description": description,
+  "applicationCategory": "EducationalApplication",
+  "operatingSystem": "All",
+  "browserRequirements": "Requires JavaScript. Requires HTML5."
+};
+---
+
+<Layout title={title} description={description} keywords={keywords} currentPath="/letras-burbuja" schemaData={schemaData}>
+  <div class="max-w-4xl mx-auto px-4 mt-6 sm:mt-10">
+    <BubbleLetters client:load />
+  </div>
+</Layout>

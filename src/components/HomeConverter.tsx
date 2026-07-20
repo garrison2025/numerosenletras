@@ -199,16 +199,34 @@ export default function HomeConverter({ initialNumber, onNavigate }: { initialNu
     }
   }, []);
 
-  // Sync initialNumber when it changes
+  // Sync initialNumber when it changes or read from URL query parameters on mount
   useEffect(() => {
     if (initialNumber) {
       setInputVal(initialNumber);
+    } else {
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const n = urlParams.get("n") || urlParams.get("amount");
+        if (n) {
+          setInputVal(n);
+        }
+      } catch (e) {
+        // Ignore fallback
+      }
     }
   }, [initialNumber]);
 
-  // Sync inputVal with browser URL parameters in real time (debounced)
+  // Sync inputVal with browser URL parameters and document.title in real time (debounced)
   useEffect(() => {
     const rawVal = inputVal.trim();
+    if (typeof document !== "undefined") {
+      if (rawVal && !isNaN(Number(rawVal.replace(/[^0-9.-]/g, '')))) {
+        document.title = `¿Cómo se escribe ${rawVal} en letras? | Conversor de Números`;
+      } else {
+        document.title = "Conversor de Números a Letras | Escribir Números en Palabras";
+      }
+    }
+
     const timer = setTimeout(() => {
       try {
         const url = new URL(window.location.href);

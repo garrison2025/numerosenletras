@@ -12,7 +12,7 @@ import {
 
 interface NavbarProps {
   currentPath: string;
-  onNavigate: (path: string) => void;
+  onNavigate?: (path: string) => void;
 }
 
 export default function Navbar({ currentPath, onNavigate }: NavbarProps) {
@@ -63,8 +63,11 @@ export default function Navbar({ currentPath, onNavigate }: NavbarProps) {
     }
   ];
 
-  const handleNavClick = (id: string) => {
-    onNavigate(id);
+  const handleNavClick = (id: string, e: React.MouseEvent) => {
+    if (onNavigate) {
+      e.preventDefault();
+      onNavigate(id);
+    }
     setIsOpen(false);
   };
 
@@ -77,8 +80,7 @@ export default function Navbar({ currentPath, onNavigate }: NavbarProps) {
             <a 
               href="/"
               onClick={(e) => {
-                e.preventDefault();
-                handleNavClick("/");
+                handleNavClick("/", e);
               }}
               className="flex items-center space-x-3 group cursor-pointer text-left"
             >
@@ -147,8 +149,7 @@ export default function Navbar({ currentPath, onNavigate }: NavbarProps) {
                   key={item.id}
                   href={item.id}
                   onClick={(e) => {
-                    e.preventDefault();
-                    handleNavClick(item.id);
+                    handleNavClick(item.id, e);
                   }}
                   className={`relative px-4 py-2.5 rounded-2xl flex flex-col items-start text-left transition-all duration-300 cursor-pointer ${buttonStyle}`}
                 >
@@ -199,8 +200,7 @@ export default function Navbar({ currentPath, onNavigate }: NavbarProps) {
                 key={item.id}
                 href={item.id}
                 onClick={(e) => {
-                  e.preventDefault();
-                  handleNavClick(item.id);
+                  handleNavClick(item.id, e);
                 }}
                 className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-left transition-all cursor-pointer ${itemStyle}`}
               >

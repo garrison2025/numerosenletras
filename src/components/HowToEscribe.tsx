@@ -129,7 +129,7 @@ const QUIZ_QUESTIONS = [
 export default function HowToEscribe({ 
   onSelectNumber 
 }: { 
-  onSelectNumber: (num: string) => void 
+  onSelectNumber?: (num: string) => void 
 }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedFaq, setExpandedFaq] = useState<number | null>(0);
@@ -207,7 +207,11 @@ export default function HowToEscribe({
   };
 
   const handleLoadInConverter = (numStr: string) => {
-    onSelectNumber(numStr);
+    if (onSelectNumber) {
+      onSelectNumber(numStr);
+    } else {
+      window.location.href = `/?n=${numStr}`;
+    }
     setSelectedSeoNum(null);
   };
 

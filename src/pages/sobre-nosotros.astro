@@ -1,0 +1,11 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { AboutUs } from '../components/LegalPages';
+
+const title = "Quiénes Somos | numerosenletras.org";
+const description = "Conoce el motor técnico, la rigurosa precisión lingüística y los valores de precisión que impulsan nuestro convertidor de números a letras.";
+---
+
+<Layout title={title} description={description} currentPath="/sobre-nosotros">
+  <AboutUs client:load />
+</Layout>

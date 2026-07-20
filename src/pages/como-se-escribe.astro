@@ -1,0 +1,53 @@
+---
+import Layout from '../layouts/Layout.astro';
+import HowToEscribe from '../components/HowToEscribe';
+
+const title = "¿Cómo se escribe...? | Ortografía de Números en Español";
+const description = "Guía ortográfica y diccionario de números en letras. Aprende las reglas de acentuación, concordancia y ortografía correcta de los números complejos.";
+const keywords = "como se escribe, ortografia de numeros, numeros en letras rae, cien o ciento, veintiuno o veintiun";
+
+const schemaData = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "¿Cómo se escribe con letra el número 100?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Saber cómo se escribe con letra el 100 es una de las dudas más comunes. Se escribe estrictamente como 'cien' cuando expresa la cantidad exacta de 100 (ej: cien personas, cien euros). Sin embargo, se transforma en 'ciento' cuando va seguido de otros números menores."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Al buscar cómo se escribe con letra el 21, ¿se usa 'veintiuno' o 'veintiún'?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Para entender cómo se escribe con letra el número 21, es importante notar que ambas formas son correctas pero dependen del contexto gramatical: se usa 'veintiún' cuando acompaña directamente a un sustantivo masculino, y se utiliza 'veintiuno' cuando se menciona el número de forma aislada."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Para transacciones financieras, ¿cómo se escribe con letra el 1000?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Si te preguntas cómo se escribe con letra la cifra de 1000, la RAE aconseja el uso exclusivo de 'mil' cuando nos referimos de forma directa y única. El uso de 'un mil' se considera redundante en el habla común, aunque es aceptado y muy frecuente en documentos financieros."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cómo se escribe con letra la palabra millón?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Cuando estudiamos cómo se escribe con letra una cifra de millones, vemos que 'millón' lleva tilde en la 'o' por ser una palabra aguda terminada en 'n'. Su plural es 'millones', el cual pierde la tilde por convertirse en una palabra llana terminada en 's'."
+      }
+    }
+  ]
+};
+---
+
+<Layout title={title} description={description} keywords={keywords} currentPath="/como-se-escribe" schemaData={schemaData}>
+  <div class="max-w-4xl mx-auto px-4 mt-6 sm:mt-10">
+    <HowToEscribe client:load />
+  </div>
+</Layout>

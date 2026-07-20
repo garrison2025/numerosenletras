@@ -108,16 +108,34 @@ export default function QuantityWithLetter({ initialAmount }: { initialAmount?: 
     return CURRENCIES[0];
   });
 
-  // Sync with incoming prop for deep links
+  // Sync with incoming prop for deep links or query parameters on mount
   useEffect(() => {
     if (initialAmount) {
       setAmount(initialAmount);
+    } else {
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const n = urlParams.get("n") || urlParams.get("amount");
+        if (n) {
+          setAmount(n);
+        }
+      } catch (e) {
+        // Ignore fallback
+      }
     }
   }, [initialAmount]);
 
-  // Sync amount state with browser URL search parameters in real time (debounced)
+  // Sync amount state with browser URL search parameters and document.title in real time (debounced)
   useEffect(() => {
     const rawVal = amount.trim();
+    if (typeof document !== "undefined") {
+      if (rawVal && !isNaN(Number(rawVal.replace(/[^0-9.-]/g, '')))) {
+        document.title = `¿Cómo se escribe ${rawVal} en letras? | Cantidad con Letra`;
+      } else {
+        document.title = "Conversor de Cantidad con Letra | Escribir Números en Palabras";
+      }
+    }
+
     const timer = setTimeout(() => {
       try {
         const url = new URL(window.location.href);

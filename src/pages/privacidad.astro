@@ -1,0 +1,11 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { PrivacyPolicy } from '../components/LegalPages';
+
+const title = "Política de Privacidad | numerosenletras.org";
+const description = "Consulta nuestra política de privacidad. Garantizamos seguridad total: no almacenamos datos en servidores externos; todo se ejecuta localmente.";
+---
+
+<Layout title={title} description={description} currentPath="/privacidad">
+  <PrivacyPolicy client:load />
+</Layout>

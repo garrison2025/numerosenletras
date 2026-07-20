@@ -1,0 +1,25 @@
+---
+import Layout from '../layouts/Layout.astro';
+import QuantityWithLetter from '../components/QuantityWithLetter';
+
+const title = "Convertir Cantidades a Letras | Generador para Cheques y Facturas";
+const description = "Escribe cualquier cantidad de dinero en letras de forma correcta. Compatible con pesos, dólares, euros y más. Genera el formato formal para rellenar cheques y recibos.";
+const keywords = "cantidad con letra, números a letras, cheques en letras, facturas con letra, escribir cantidades, convertidor de dinero, pesos a letras";
+
+const schemaData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Cantidad con Letra - Generador de Cheques y Facturas",
+  "url": "https://numerosenletras.org/cantidad-con-letra",
+  "description": description,
+  "applicationCategory": "FinancialApplication",
+  "operatingSystem": "All",
+  "browserRequirements": "Requires JavaScript. Requires HTML5."
+};
+---
+
+<Layout title={title} description={description} keywords={keywords} currentPath="/cantidad-con-letra" schemaData={schemaData}>
+  <div class="max-w-4xl mx-auto px-4 mt-6 sm:mt-10">
+    <QuantityWithLetter client:load />
+  </div>
+</Layout>

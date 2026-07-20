@@ -143,10 +143,20 @@ const DETAILED_BIO_PRESETS = {
 export default function AestheticLetters({ initialText }: { initialText?: string }) {
   const [inputText, setInputText] = useState(initialText || "Letras Bonitas 2026");
 
-  // Sync with incoming prop for deep links
+  // Sync with incoming prop for deep links or query parameters on mount
   useEffect(() => {
     if (initialText) {
       setInputText(initialText);
+    } else {
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const q = urlParams.get("text") || urlParams.get("q");
+        if (q) {
+          setInputText(q);
+        }
+      } catch (e) {
+        // Ignore fallback
+      }
     }
   }, [initialText]);
 

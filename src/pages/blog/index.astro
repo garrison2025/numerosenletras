@@ -1,0 +1,22 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Blog from '../../components/Blog';
+
+const title = "Blog Oficial de numerosenletras.org | Ortografía, Finanzas y Tipografía Creativa";
+const description = "Explora nuestras guías gratuitas sobre cómo escribir números en letras según la RAE, cómo rellenar un cheque sin errores y cómo personalizar tus redes sociales con letras burbuja y aesthetic.";
+const keywords = "blog oficial, guias ortograficas, finanzas, tipografia creativa, como escribir numeros, letras burbuja, letras aesthetic";
+
+const schemaData = {
+  "@context": "https://schema.org",
+  "@type": "Blog",
+  "name": "Blog Oficial de numerosenletras.org",
+  "url": "https://numerosenletras.org/blog",
+  "description": description
+};
+---
+
+<Layout title={title} description={description} keywords={keywords} currentPath="/blog" schemaData={schemaData}>
+  <div class="max-w-4xl mx-auto px-4 mt-6 sm:mt-10 animate-fade-in">
+    <Blog client:load />
+  </div>
+</Layout>

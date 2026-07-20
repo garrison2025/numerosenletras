@@ -1,0 +1,25 @@
+---
+import Layout from '../layouts/Layout.astro';
+import AestheticLetters from '../components/AestheticLetters';
+
+const title = "Letras Aesthetic | Conversor de Fuentes Lindas y Bonitas online";
+const description = "Transforma tus textos normales en letras aesthetic, fuentes cursivas, negritas y símbolos mágicos para copiar y pegar en tu biografía de Instagram, TikTok y más.";
+const keywords = "letras aesthetic, tipografias bonitas, fuentes lindas, fuentes cursivas para copiar, letras para instagram, copiar y pegar fuentes";
+
+const schemaData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Letras Aesthetic - Conversor de Fuentes Bonitas",
+  "url": "https://numerosenletras.org/letras-aesthetic",
+  "description": description,
+  "applicationCategory": "EducationalApplication",
+  "operatingSystem": "All",
+  "browserRequirements": "Requires JavaScript. Requires HTML5."
+};
+---
+
+<Layout title={title} description={description} keywords={keywords} currentPath="/letras-aesthetic" schemaData={schemaData}>
+  <div class="max-w-4xl mx-auto px-4 mt-6 sm:mt-10">
+    <AestheticLetters client:load />
+  </div>
+</Layout>

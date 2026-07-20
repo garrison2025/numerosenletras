@@ -23,10 +23,6 @@ import {
 import { convertNumberToLetters } from "../utils/numberToLetters";
 import { AESTHETIC_FONTS } from "../utils/fontGenerators";
 
-import blogNumerosLetras from "../assets/images/blog_numeros_letras.webp";
-import blogLetrasBurbuja from "../assets/images/blog_letras_burbuja.webp";
-import blogLetrasAesthetic from "../assets/images/blog_letras_aesthetic.webp";
-
 export interface BlogPost {
   id: string;
   slug: string;
@@ -52,7 +48,7 @@ export const BLOG_POSTS: BlogPost[] = [
     readTime: "12 min de lectura",
     category: "Finanzas",
     keywords: ["numeros en letras", "cantidad con letra", "numeros a letras", "convertir numeros a letras", "cómo se escribe con letra", "convertidor de numeros a letras"],
-    image: blogNumerosLetras,
+    image: "/assets/images/blog_numeros_letras.webp",
     content: `
       <div class="space-y-8 font-sans text-gray-800 leading-relaxed text-base">
         <!-- Introduction -->
@@ -205,7 +201,7 @@ export const BLOG_POSTS: BlogPost[] = [
     readTime: "10 min de lectura",
     category: "Diseño",
     keywords: ["letras burbuja", "letras aesthetic copiar y pegar", "letras pequeñas"],
-    image: blogLetrasBurbuja,
+    image: "/assets/images/blog_letras_burbuja.webp",
     content: `
       <div class="space-y-8 font-sans text-gray-800 leading-relaxed text-base">
         <!-- Introduction -->
@@ -301,7 +297,7 @@ export const BLOG_POSTS: BlogPost[] = [
     readTime: "11 min de lectura",
     category: "Diseño",
     keywords: ["letras pequeñas", "letras aesthetic copiar y pegar", "convertidor de numeros a letras"],
-    image: blogLetrasAesthetic,
+    image: "/assets/images/blog_letras_aesthetic.webp",
     content: `
       <div class="space-y-8 font-sans text-gray-800 leading-relaxed text-base">
         <!-- Introduction -->
@@ -685,7 +681,7 @@ function BlogWidget({ slug, onNavigate }: { slug: string; onNavigate: (path: str
   return null;
 }
 
-export default function Blog({ onNavigate }: { onNavigate: (path: string) => void }) {
+export default function Blog({ onNavigate, selectedSlug }: { onNavigate?: (path: string) => void; selectedSlug?: string }) {
   const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
@@ -695,6 +691,18 @@ export default function Blog({ onNavigate }: { onNavigate: (path: string) => voi
   const [headings, setHeadings] = useState<{ id: string; text: string }[]>([]);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [showScrollTop, setShowScrollTop] = useState(false);
+
+  // Set initial post if selectedSlug is passed
+  useEffect(() => {
+    if (selectedSlug) {
+      const post = BLOG_POSTS.find(p => p.slug === selectedSlug);
+      if (post) {
+        setSelectedPost(post);
+      }
+    } else {
+      setSelectedPost(null);
+    }
+  }, [selectedSlug]);
 
   // Extract headings from prose dynamically when selecting a post
   useEffect(() => {
@@ -757,8 +765,9 @@ export default function Blog({ onNavigate }: { onNavigate: (path: string) => voi
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [selectedPost]);
 
-  // Sync route with slug if needed, but for our hash router, we can use local state + hash trigger
+  // Sync route with slug if needed, but only if onNavigate is present (SPA mode fallback)
   useEffect(() => {
+    if (!onNavigate) return;
     const handleHashChange = () => {
       const hash = window.location.hash;
       if (hash.startsWith("#/blog/")) {
@@ -777,15 +786,23 @@ export default function Blog({ onNavigate }: { onNavigate: (path: string) => voi
     handleHashChange();
     window.addEventListener("hashchange", handleHashChange);
     return () => window.removeEventListener("hashchange", handleHashChange);
-  }, []);
+  }, [onNavigate]);
 
   const handlePostClick = (post: BlogPost) => {
-    window.location.hash = `#/blog/${post.slug}`;
+    if (onNavigate) {
+      window.location.hash = `#/blog/${post.slug}`;
+    } else {
+      window.location.href = `/blog/${post.slug}`;
+    }
     setSelectedPost(post);
   };
 
   const handleBackToList = () => {
-    window.location.hash = `#/blog`;
+    if (onNavigate) {
+      window.location.hash = `#/blog`;
+    } else {
+      window.location.href = `/blog`;
+    }
     setSelectedPost(null);
   };
 

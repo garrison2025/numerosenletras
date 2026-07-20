@@ -1,0 +1,11 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { ContactPage } from '../components/LegalPages';
+
+const title = "Contacto | numerosenletras.org";
+const description = "Ponte en contacto con el equipo de numerosenletras.org para sugerencias, reportes de errores, dudas académicas o colaboraciones.";
+---
+
+<Layout title={title} description={description} currentPath="/contacto">
+  <ContactPage client:load />
+</Layout>

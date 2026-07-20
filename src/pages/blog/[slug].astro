@@ -1,0 +1,54 @@
+---
+import { BLOG_POSTS } from '../../components/Blog';
+import Layout from '../../layouts/Layout.astro';
+import Blog from '../../components/Blog';
+
+export async function getStaticPaths() {
+  return BLOG_POSTS.map(post => ({
+    params: { slug: post.slug },
+    props: { post }
+  }));
+}
+
+const { post } = Astro.props;
+const currentPath = `/blog/${post.slug}`;
+
+// Get clean image source URL string
+const imageSrc = post.image && typeof post.image === 'object' && 'src' in post.image 
+  ? (post.image as any).src 
+  : post.image;
+
+const schemaData = {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": post.title,
+  "description": post.excerpt,
+  "datePublished": "2026-07-17T00:00:00+00:00",
+  "author": {
+    "@type": "Organization",
+    "name": post.author
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "numerosenletras.org",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://numerosenletras.org/favicon.svg"
+    }
+  },
+  "image": imageSrc ? (imageSrc.startsWith("http") ? imageSrc : `https://numerosenletras.org${imageSrc}`) : undefined
+};
+---
+
+<Layout 
+  title={`${post.title} | Blog numerosenletras.org`} 
+  description={post.excerpt} 
+  keywords={post.keywords.join(", ")} 
+  currentPath={currentPath}
+  schemaData={schemaData}
+  image={imageSrc}
+>
+  <div class="max-w-4xl mx-auto px-4 mt-6 sm:mt-10 animate-fade-in">
+    <Blog selectedSlug={post.slug} client:load />
+  </div>
+</Layout>

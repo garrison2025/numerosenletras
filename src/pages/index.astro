@@ -1,0 +1,25 @@
+---
+import Layout from '../layouts/Layout.astro';
+import HomeConverter from '../components/HomeConverter';
+
+const title = "Conversor de Números a Letras | Escribir Números en Palabras";
+const description = "Herramienta online para convertir números a letras en español de forma instantánea. Ideal para cheques, contratos, facturas y aprender cómo se escribe cualquier cantidad.";
+const keywords = "como se escribe con letra, cómo se escribe con letra, conversor de numeros a letras, números a letras, letras burbuja, letras burbuja copiar y pegar, generador de letras burbuja, letras aesthetic";
+
+const schemaData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Conversor de Números a Letras",
+  "url": "https://numerosenletras.org/",
+  "description": description,
+  "applicationCategory": "EducationalApplication",
+  "operatingSystem": "All",
+  "browserRequirements": "Requires JavaScript. Requires HTML5."
+};
+---
+
+<Layout title={title} description={description} keywords={keywords} currentPath="/" schemaData={schemaData}>
+  <div class="max-w-4xl mx-auto px-4 mt-6 sm:mt-10">
+    <HomeConverter client:load />
+  </div>
+</Layout>

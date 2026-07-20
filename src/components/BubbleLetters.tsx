@@ -137,10 +137,20 @@ export default function BubbleLetters({ initialText }: { initialText?: string })
   const [textCase, setTextCase] = useState<"original" | "upper" | "lower">("original");
   const [fontSize, setFontSize] = useState<number>(24);
 
-  // Sync with incoming prop for deep links
+  // Sync with incoming prop for deep links or query parameters on mount
   useEffect(() => {
     if (initialText) {
       setInputText(initialText);
+    } else {
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const q = urlParams.get("text") || urlParams.get("q");
+        if (q) {
+          setInputText(q);
+        }
+      } catch (e) {
+        // Ignore fallback
+      }
     }
   }, [initialText]);
 
