@@ -19,7 +19,10 @@ import {
   ChevronUp,
   Gamepad2,
   Quote,
-  Share2
+  Share2,
+  Star,
+  Edit3,
+  Wand2
 } from "lucide-react";
 
 // Symbol injector categories
@@ -46,6 +49,21 @@ const SYMBOL_CATEGORIES = [
       "(｡♥‿♥｡)", "(◡‿◡✿)", "(っ◔◡◔)っ", "≧◡≦", "(^_<)～☆", "(*^‿^*)", "o(≧▽≦)o", "(◕‿◕✿)", 
       "ʕ•ᴥ•ʔ", "(=^·^=)", "ଘ(੭*ˊᵕˋ)੭*", "(´• ω •`)"
     ]
+  },
+  {
+    id: "arrows",
+    label: "➔ Flechas / Bordes",
+    symbols: ["➔", "➘", "➙", "➚", "➛", "➜", "➞", "➟", "༺", "༻", "〖", "〗", "〘", "〙", "〔", "〕", "【", "】", "«", "»"]
+  },
+  {
+    id: "music",
+    label: "♫ Música / Notas",
+    symbols: ["♫", "♬", "♪", "♩", "♭", "♮", "♯", "✉", "✍", "✎", "✏", "✐", "⚔", "🛡", "⚙", "⛓", "⚓", "👑"]
+  },
+  {
+    id: "sparkles_shapes",
+    label: "✧ Brillos / Figuras",
+    symbols: ["✧", "✦", "❈", "❉", "❊", "❃", "❂", "❄", "❅", "❆", "♠", "♥", "♦", "♣", "⚀", "⚁", "⚂", "⚃", "⚄", "⚅", "♾", "☯", "☮"]
   }
 ];
 
@@ -190,6 +208,62 @@ export default function AestheticLetters({ initialText }: { initialText?: string
   const [normalizeAccents, setNormalizeAccents] = useState(true);
   const [fontSize, setFontSize] = useState<number>(20);
 
+  // Toast Notification state
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastVisible, setToastVisible] = useState(false);
+  const toastTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const showToast = (msg: string) => {
+    if (toastTimeoutRef.current) {
+      clearTimeout(toastTimeoutRef.current);
+    }
+    setToastMessage(msg);
+    setToastVisible(true);
+    toastTimeoutRef.current = setTimeout(() => {
+      setToastVisible(false);
+    }, 2500);
+  };
+
+  // Clean up toast timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (toastTimeoutRef.current) {
+        clearTimeout(toastTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  // Favorites system state
+  const [favorites, setFavorites] = useState<string[]>(() => {
+    try {
+      const stored = localStorage.getItem("aesthetic_favorites");
+      return stored ? JSON.parse(stored) : [];
+    } catch (e) {
+      return [];
+    }
+  });
+
+  const toggleFavorite = (id: string, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    const isFav = favorites.includes(id);
+    const newFavs = isFav ? favorites.filter(f => f !== id) : [...favorites, id];
+    setFavorites(newFavs);
+    try {
+      localStorage.setItem("aesthetic_favorites", JSON.stringify(newFavs));
+    } catch (err) {
+      // Ignore
+    }
+    showToast(isFav ? "Estilo eliminado de favoritos 🤍" : "Estilo guardado en tus favoritos 💖");
+  };
+
+  // Custom decorator builder state
+  const [customPrefix, setCustomPrefix] = useState("༺★");
+  const [customSuffix, setCustomSuffix] = useState("★༻");
+  const [isCustomExpanded, setIsCustomExpanded] = useState(false);
+
+  // Editing Bio preset
+  const [editingBio, setEditingBio] = useState<{ name: string; raw: string } | null>(null);
+
   // Helper to pre-process and optimize input text for maximum font mapping compatibility
   const getTransformedText = (text: string) => {
     let result = text;
@@ -229,6 +303,7 @@ export default function AestheticLetters({ initialText }: { initialText?: string
     navigator.clipboard.writeText(text);
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2000);
+    showToast(`¡Copiado!: "${text.length > 25 ? text.substring(0, 25) + '...' : text}" 📋✨`);
   };
 
   const handleInjectSymbol = (symbol: string) => {
@@ -490,6 +565,128 @@ export default function AestheticLetters({ initialText }: { initialText?: string
             </div>
           </div>
 
+          {/* Custom Decorator Wizard Panel */}
+          <div className="bg-purple-50/20 border border-purple-150 rounded-2xl p-4 sm:p-5">
+            <button
+              type="button"
+              onClick={() => setIsCustomExpanded(!isCustomExpanded)}
+              className="w-full flex items-center justify-between text-left cursor-pointer group focus:outline-hidden"
+            >
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 bg-purple-100 rounded-lg text-purple-700">
+                  <Wand2 className="w-4 h-4" />
+                </div>
+                <div>
+                  <span className="block text-xs font-bold text-gray-800 uppercase tracking-wide">
+                    Diseñador de Decorados Personalizados
+                  </span>
+                  <span className="block text-[10px] text-gray-500 font-medium">
+                    Crea tu propio marco o borde personalizado para tu apodo o frase
+                  </span>
+                </div>
+              </div>
+              <div className="text-purple-600 group-hover:text-purple-800 transition-colors">
+                {isCustomExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+              </div>
+            </button>
+
+            <AnimatePresence>
+              {isCustomExpanded && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.25, ease: "easeInOut" }}
+                  className="overflow-hidden"
+                >
+                  <div className="pt-4 border-t border-purple-100/60 mt-4 space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {/* Left decorator column */}
+                      <div>
+                        <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">
+                          Prefijo (Izquierda):
+                        </label>
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={customPrefix}
+                            onChange={(e) => setCustomPrefix(e.target.value)}
+                            maxLength={15}
+                            placeholder="Ej. ༺★"
+                            className="w-full bg-white border border-gray-200 focus:border-purple-500 rounded-xl px-3 py-2 text-xs font-sans font-bold shadow-2xs"
+                          />
+                        </div>
+                        {/* Quick preset symbols for left */}
+                        <div className="flex flex-wrap gap-1 mt-2">
+                          {["༺", "★彡", "𓆩♡𓆪", "✧*̥˚", "•´¯`•.", "⚡", "°•. ✿ .•°", "╰-➤"].map((sym) => (
+                            <button
+                              key={sym}
+                              type="button"
+                              onClick={() => setCustomPrefix(sym)}
+                              className="text-[10px] bg-white hover:bg-purple-50 border border-gray-150 hover:border-purple-300 rounded px-1.5 py-0.5 font-bold cursor-pointer transition-all active:scale-95 text-gray-600"
+                            >
+                              {sym}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Right decorator column */}
+                      <div>
+                        <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">
+                          Sufijo (Derecha):
+                        </label>
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={customSuffix}
+                            onChange={(e) => setCustomSuffix(e.target.value)}
+                            maxLength={15}
+                            placeholder="Ej. ★༻"
+                            className="w-full bg-white border border-gray-200 focus:border-purple-500 rounded-xl px-3 py-2 text-xs font-sans font-bold shadow-2xs"
+                          />
+                        </div>
+                        {/* Quick preset symbols for right */}
+                        <div className="flex flex-wrap gap-1 mt-2">
+                          {["༻", "彡★", "𓆩♡𓆪", "*̥˚✧", ".•´¯`•", "⚡", "°•. ✿ .•°", "❝"].map((sym) => (
+                            <button
+                              key={sym}
+                              type="button"
+                              onClick={() => setCustomSuffix(sym)}
+                              className="text-[10px] bg-white hover:bg-purple-50 border border-gray-150 hover:border-purple-300 rounded px-1.5 py-0.5 font-bold cursor-pointer transition-all active:scale-95 text-gray-600"
+                            >
+                              {sym}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Output display for custom decorators */}
+                    <div className="bg-purple-100/35 border border-purple-200/50 rounded-2xl p-4 flex flex-col sm:flex-row justify-between items-center gap-3">
+                      <div className="text-left w-full sm:w-auto">
+                        <span className="block text-[9px] font-bold text-purple-600 uppercase tracking-widest mb-0.5">
+                          Resultado de tu Diseño
+                        </span>
+                        <span className="font-sans font-extrabold text-base text-gray-900 break-all select-all block">
+                          {customPrefix} {processedText || "Ejemplo"} {customSuffix}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleCopy("custom_dec", `${customPrefix} ${processedText || "Ejemplo"} ${customSuffix}`)}
+                        className="w-full sm:w-auto px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs rounded-xl transition-all shadow-md hover:shadow-purple-200 cursor-pointer flex items-center justify-center gap-1.5 hover:scale-103"
+                      >
+                        <Copy className="w-3.5 h-3.5" />
+                        <span>Copiar Decoración</span>
+                      </button>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
           {/* Filter controls and Search inside generator */}
           <div className="flex flex-col sm:flex-row gap-4 items-center justify-between pt-4 border-t border-gray-150">
             <div className="flex bg-gray-100/85 p-1.5 rounded-2xl border border-gray-200/50 w-full sm:w-auto">
@@ -572,6 +769,89 @@ export default function AestheticLetters({ initialText }: { initialText?: string
         </div>
       )}
 
+      {/* 1.5 Pinned Favorite Styles Section */}
+      {favorites.length > 0 && (
+        <div className="mb-10 text-left border-t border-purple-100/50 pt-8">
+          <div className="flex items-center justify-between mb-4 px-2">
+            <h3 className="font-sans font-extrabold text-gray-900 text-sm flex items-center gap-1.5">
+              <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
+              <span>Mis Fuentes Favoritas ({favorites.length})</span>
+            </h3>
+            <button
+              onClick={() => {
+                setFavorites([]);
+                localStorage.removeItem("aesthetic_favorites");
+                showToast("Todos los favoritos han sido eliminados 🗑️");
+              }}
+              className="text-[10px] font-bold text-gray-400 hover:text-rose-600 transition-colors flex items-center gap-1 cursor-pointer"
+            >
+              <Trash2 className="w-3 h-3" />
+              <span>Eliminar todos</span>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {AESTHETIC_FONTS.filter(font => favorites.includes(font.id)).map((font) => {
+              const generatedVal = processedText.trim() ? font.generate(processedText) : font.generate("Ejemplo");
+              const isCopied = copiedId === `fav_${font.id}`;
+
+              return (
+                <div
+                  key={`fav_${font.id}`}
+                  className="bg-radial from-amber-50/20 to-white hover:to-amber-50/10 rounded-2xl p-5 text-left border border-amber-200/60 shadow-xs hover:shadow-md transition-all duration-300 flex flex-col justify-between"
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="font-sans font-bold text-xs text-amber-800 flex items-center gap-1.5">
+                        <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+                        {font.name}
+                      </span>
+                      <button
+                        onClick={(e) => toggleFavorite(font.id, e)}
+                        className="p-1 rounded-lg hover:bg-amber-100/50 text-amber-500 hover:text-gray-400 transition-colors cursor-pointer"
+                        title="Quitar de favoritos"
+                      >
+                        <Heart className="w-4 h-4 fill-amber-500 text-amber-500 stroke-none" />
+                      </button>
+                    </div>
+
+                    <p
+                      className="font-sans font-bold text-gray-900 py-2 select-all break-all tracking-wide min-h-[48px]"
+                      style={{ fontSize: `${fontSize}px`, lineHeight: "1.3" }}
+                    >
+                      {generatedVal}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center justify-between mt-3.5 pt-3 border-t border-amber-100/50">
+                    <span className="text-[10px] text-gray-400 font-sans truncate pr-2 font-medium">
+                      {font.description}
+                    </span>
+
+                    <button
+                      onClick={() => handleCopy(`fav_${font.id}`, generatedVal)}
+                      className={`px-3.5 py-2 rounded-xl text-xs font-bold font-sans transition-all duration-300 flex items-center gap-1 cursor-pointer hover:scale-105 active:scale-95 bg-amber-600 text-white hover:bg-amber-500 shadow-md shadow-amber-500/10`}
+                    >
+                      {isCopied ? (
+                        <>
+                          <Check className="w-3.5 h-3.5" />
+                          <span>¡Copiado!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-3.5 h-3.5" />
+                          <span>Copiar</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* 2. Main Fonts List Container */}
       <div className="space-y-4">
         <div className="flex items-center justify-between px-2">
@@ -607,11 +887,21 @@ export default function AestheticLetters({ initialText }: { initialText?: string
                         {isPequena && <span className="w-2 h-2 rounded-full bg-purple-500 animate-pulse" />}
                         {font.name}
                       </span>
-                      {isPequena && (
-                        <span className="text-[9px] bg-purple-50 border border-purple-150 text-purple-700 px-2 py-0.5 rounded font-mono font-bold">
-                          Letras Pequeñas (Popular)
-                        </span>
-                      )}
+                      <div className="flex items-center gap-1.5">
+                        {isPequena && (
+                          <span className="text-[9px] bg-purple-50 border border-purple-150 text-purple-700 px-2 py-0.5 rounded font-mono font-bold">
+                            Letras Pequeñas (Popular)
+                          </span>
+                        )}
+                        <button
+                          type="button"
+                          onClick={(e) => toggleFavorite(font.id, e)}
+                          className="p-1 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-rose-500 transition-colors cursor-pointer"
+                          title={favorites.includes(font.id) ? "Quitar de favoritos" : "Guardar en favoritos"}
+                        >
+                          <Heart className={`w-4 h-4 ${favorites.includes(font.id) ? "fill-rose-500 text-rose-500 stroke-none" : "text-gray-400"}`} />
+                        </button>
+                      </div>
                     </div>
                     
                     {/* Generated Text Row */}
@@ -703,22 +993,138 @@ export default function AestheticLetters({ initialText }: { initialText?: string
                   <pre className="text-xs text-gray-700 font-sans whitespace-pre-line leading-relaxed min-h-[90px] text-left">
                     {preset.preview}
                   </pre>
-                  <button
-                    onClick={() => handleCopy(preset.name, preset.raw)}
-                    className={`w-full py-2.5 mt-4 rounded-xl text-xs font-bold cursor-pointer transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105 active:scale-95 ${
-                      isCopied 
-                        ? "bg-emerald-600 text-white" 
-                        : "bg-white border border-gray-200 hover:border-purple-200 text-gray-500 hover:text-purple-700"
-                    }`}
-                  >
-                    {isCopied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                    {isCopied ? "¡Copiado!" : "Copiar plantilla"}
-                  </button>
+                  <div className="grid grid-cols-2 gap-2 mt-4">
+                    <button
+                      type="button"
+                      onClick={() => setEditingBio({ name: preset.name, raw: preset.raw })}
+                      className="py-2 bg-purple-50 hover:bg-purple-100 border border-purple-150 text-purple-700 rounded-xl text-xs font-bold cursor-pointer transition-all flex items-center justify-center gap-1 hover:scale-102 active:scale-95"
+                      title="Editar y personalizar la biografía"
+                    >
+                      <Edit3 className="w-3.5 h-3.5 text-purple-500" />
+                      <span>Editar</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleCopy(preset.name, preset.raw)}
+                      className={`py-2 rounded-xl text-xs font-bold cursor-pointer transition-all duration-300 flex items-center justify-center gap-1 hover:scale-102 active:scale-95 ${
+                        isCopied 
+                          ? "bg-emerald-600 text-white" 
+                          : "bg-white border border-gray-200 hover:border-purple-200 text-gray-500 hover:text-purple-700"
+                      }`}
+                    >
+                      {isCopied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                      <span>{isCopied ? "¡Copiado!" : "Copiar"}</span>
+                    </button>
+                  </div>
                 </div>
               );
             })}
           </div>
         </div>
+
+        {/* Custom Bio Customizer Modal Overlay */}
+        <AnimatePresence>
+          {editingBio && (
+            <div className="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                className="bg-white rounded-3xl p-6 max-w-lg w-full shadow-2xl border border-gray-100 flex flex-col relative"
+              >
+                <div className="flex items-center justify-between mb-4 border-b border-gray-100 pb-3">
+                  <h4 className="font-sans font-bold text-gray-900 text-sm flex items-center gap-2">
+                    <Edit3 className="w-4 h-4 text-purple-600" />
+                    <span>Personalizar Biografía: {editingBio.name}</span>
+                  </h4>
+                  <button
+                    onClick={() => setEditingBio(null)}
+                    className="p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg cursor-pointer transition-colors text-sm font-bold"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                <div className="space-y-4">
+                  <p className="text-[10px] text-gray-500 font-medium">
+                    Modifica las líneas de abajo para adaptar la biografía a tu gusto. Puedes escribir tu nombre, redes o usar el botón para inyectar tu texto actual.
+                  </p>
+
+                  <textarea
+                    value={editingBio.raw}
+                    onChange={(e) => setEditingBio({ ...editingBio, raw: e.target.value })}
+                    rows={5}
+                    className="w-full bg-gray-50 border border-gray-200 focus:border-purple-500 rounded-2xl p-4 text-xs font-sans text-gray-800 leading-relaxed outline-hidden focus:ring-4 focus:ring-purple-500/5 shadow-inner"
+                    placeholder="Escribe tu biografía aquí..."
+                  />
+
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const currentTxt = processedText.trim() || "Letras Lindas";
+                        let newRaw = editingBio.raw;
+                        if (newRaw.includes("Cosmic Soul")) {
+                          newRaw = newRaw.replace("Cosmic Soul", currentTxt);
+                        } else if (newRaw.includes("🧸 my life, my rules 🌸")) {
+                          newRaw = newRaw.replace("🧸 my life, my rules 🌸", `🧸 ${currentTxt} 🌸`);
+                        } else {
+                          newRaw = newRaw + `\n✨ ${currentTxt}`;
+                        }
+                        setEditingBio({ ...editingBio, raw: newRaw });
+                        showToast("¡Texto inyectado en tu plantilla! 🪄");
+                      }}
+                      className="text-[10px] font-bold text-purple-700 bg-purple-50 hover:bg-purple-100 border border-purple-200 px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1 active:scale-95"
+                    >
+                      <Wand2 className="w-3.5 h-3.5" />
+                      <span>Inyectar mi texto: "{processedText.trim() || "Letras Lindas"}"</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div className="flex gap-3 mt-6 border-t border-gray-100 pt-4 justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setEditingBio(null)}
+                    className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-xs font-bold transition-all cursor-pointer"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleCopy("custom_bio", editingBio.raw);
+                      setEditingBio(null);
+                    }}
+                    className="px-4.5 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold transition-all shadow-md hover:shadow-purple-200 cursor-pointer flex items-center gap-1.5"
+                  >
+                    <Copy className="w-3.5 h-3.5" />
+                    <span>Copiar Biografía</span>
+                  </button>
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+
+        {/* Premium Floating Toast Notifications */}
+        <AnimatePresence>
+          {toastVisible && (
+            <motion.div
+              initial={{ opacity: 0, y: 50, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 30, scale: 0.95 }}
+              className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-gray-900 text-white rounded-2xl px-5 py-3.5 flex items-center space-x-3 shadow-2xl border border-gray-800/80 max-w-sm w-11/12 md:w-auto"
+            >
+              <div className="flex items-center justify-center bg-emerald-500/20 text-emerald-400 p-1 rounded-full shrink-0">
+                <Check className="w-4 h-4 stroke-[3]" />
+              </div>
+              <span className="text-xs font-semibold text-gray-100 select-none block truncate">
+                {toastMessage}
+              </span>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* 4. Interactive Accordion FAQ and SEO Guide Section */}
         <div className="bg-white rounded-3xl p-6 sm:p-8 border border-gray-150 shadow-sm">

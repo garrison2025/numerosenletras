@@ -227,7 +227,17 @@ export function convertNumberToLetters(
     // e.g. "Un millón de pesos", "Dos millones de dólares"
     // But NOT "Un millón quinientos mil pesos". Check if ends with "millón" or "millones"
     let currencyConnector = " ";
-    if (integerPart > 0 && integerPart % 1000000 === 0) {
+    const checkWords = words.trim().toLowerCase();
+    if (
+      integerPart > 0 && 
+      (integerPart % 1000000 === 0 || 
+       checkWords.endsWith("millón") || 
+       checkWords.endsWith("millones") || 
+       checkWords.endsWith("billón") || 
+       checkWords.endsWith("billones") ||
+       checkWords.endsWith("millardo") ||
+       checkWords.endsWith("millardos"))
+    ) {
       currencyConnector = " de ";
     }
 

@@ -16,7 +16,12 @@ import {
   Gamepad2,
   Quote,
   Flame,
-  CheckSquare
+  CheckSquare,
+  Star,
+  Heart,
+  Edit3,
+  Wand2,
+  X
 } from "lucide-react";
 
 // Symbol injector categories specifically matching the bubble vibe
@@ -137,6 +142,74 @@ export default function BubbleLetters({ initialText }: { initialText?: string })
   const [textCase, setTextCase] = useState<"original" | "upper" | "lower">("original");
   const [fontSize, setFontSize] = useState<number>(24);
 
+  // Toast Notification state
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastVisible, setToastVisible] = useState(false);
+  const toastTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const showToast = (msg: string) => {
+    if (toastTimeoutRef.current) {
+      clearTimeout(toastTimeoutRef.current);
+    }
+    setToastMessage(msg);
+    setToastVisible(true);
+    toastTimeoutRef.current = setTimeout(() => {
+      setToastVisible(false);
+    }, 2500);
+  };
+
+  // Clean up toast timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (toastTimeoutRef.current) {
+        clearTimeout(toastTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  // Favorites system state for custom nicknames
+  const [favorites, setFavorites] = useState<{ id: string; text: string; label: string }[]>(() => {
+    try {
+      const stored = localStorage.getItem("bubble_favorites");
+      return stored ? JSON.parse(stored) : [];
+    } catch (e) {
+      return [];
+    }
+  });
+
+  const saveFavorite = (text: string, label: string) => {
+    if (!text.trim()) return;
+    const exists = favorites.some(fav => fav.text === text);
+    if (exists) {
+      showToast("Este nick de burbuja ya está en tus favoritos ❤️");
+      return;
+    }
+    const newFav = { id: Date.now().toString(), text, label };
+    const updated = [...favorites, newFav];
+    setFavorites(updated);
+    try {
+      localStorage.setItem("bubble_favorites", JSON.stringify(updated));
+    } catch (e) {}
+    showToast("¡Agregado a tus favoritos de burbuja! 💖");
+  };
+
+  const removeFavorite = (id: string) => {
+    const updated = favorites.filter(fav => fav.id !== id);
+    setFavorites(updated);
+    try {
+      localStorage.setItem("bubble_favorites", JSON.stringify(updated));
+    } catch (e) {}
+    showToast("Eliminado de tus favoritos 🗑️");
+  };
+
+  // Custom decorator builder state
+  const [customPrefix, setCustomPrefix] = useState("𓆩♡𓆪");
+  const [customSuffix, setCustomSuffix] = useState("𓆩♡𓆪");
+  const [isCustomExpanded, setIsCustomExpanded] = useState(false);
+
+  // Editing Bio preset
+  const [editingBio, setEditingBio] = useState<{ title: string; content: string } | null>(null);
+
   // Sync with incoming prop for deep links or query parameters on mount
   useEffect(() => {
     if (initialText) {
@@ -223,6 +296,7 @@ export default function BubbleLetters({ initialText }: { initialText?: string })
     navigator.clipboard.writeText(text);
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2000);
+    showToast(`¡Copiado!: "${text.length > 25 ? text.substring(0, 25) + '...' : text}" 📋✨`);
   };
 
   const handleInjectSymbol = (symbol: string) => {
@@ -437,45 +511,165 @@ export default function BubbleLetters({ initialText }: { initialText?: string })
             </div>
           </div>
 
-          {/* Quick Symbols Inserter */}
-          <div className="bg-gray-50/60 border border-gray-100 rounded-2xl p-4">
-            <div className="flex justify-between items-center mb-3">
-              <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1">
-                <Smile className="w-3.5 h-3.5 text-blue-500" />
-                Decorar tus letras burbuja copiar y pegar y letras en círculos con símbolos:
-              </span>
-            </div>
-            
-            {/* Category tabs */}
-            <div className="flex flex-wrap gap-1.5 border-b border-gray-200/60 pb-2.5 mb-3">
-              {SYMBOL_CATEGORIES.map((cat) => (
-                <button
-                  key={cat.id}
-                  onClick={() => setSelectedSymbolTab(cat.id)}
-                  className={`text-[10px] font-bold px-2.5 py-1 rounded-md transition-all cursor-pointer ${
-                    selectedSymbolTab === cat.id
-                      ? "bg-blue-100 text-blue-800 border border-blue-200"
-                      : "text-gray-500 hover:text-gray-700"
-                  }`}
-                >
-                  {cat.label}
-                </button>
-              ))}
-            </div>
+          {/* Custom Decorator Wizard Panel */}
+          <div className="bg-blue-50/20 border border-blue-150 rounded-2xl p-4 sm:p-5">
+            <button
+              type="button"
+              onClick={() => setIsCustomExpanded(!isCustomExpanded)}
+              className="w-full flex items-center justify-between text-left cursor-pointer group focus:outline-hidden"
+            >
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 bg-blue-100 rounded-lg text-blue-700">
+                  <Wand2 className="w-4 h-4" />
+                </div>
+                <div>
+                  <span className="block text-xs font-bold text-gray-800 uppercase tracking-wide">
+                    Diseñador de Decorados Personalizados
+                  </span>
+                  <span className="block text-[10px] text-gray-500 font-medium">
+                    Crea tu propio marco o borde personalizado para tu apodo o frase
+                  </span>
+                </div>
+              </div>
+              <div className="text-blue-600 group-hover:text-blue-800 transition-colors">
+                {isCustomExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+              </div>
+            </button>
 
-            {/* Symbols grid */}
-            <div className="grid grid-cols-6 sm:grid-cols-10 gap-2">
-              {SYMBOL_CATEGORIES.find(c => c.id === selectedSymbolTab)?.symbols.map((sym, i) => (
-                <button
-                  key={i}
-                  onClick={() => handleInjectSymbol(sym)}
-                  className="h-9 rounded-lg bg-white hover:bg-gray-50 border border-gray-200/60 hover:border-blue-400/50 flex items-center justify-center text-sm font-semibold text-gray-700 hover:text-gray-950 transition-all cursor-pointer hover:scale-105 active:scale-90"
-                  title={`Insertar ${sym}`}
+            <AnimatePresence>
+              {isCustomExpanded && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.25, ease: "easeInOut" }}
+                  className="overflow-hidden"
                 >
-                  {sym}
-                </button>
-              ))}
-            </div>
+                  <div className="pt-4 border-t border-blue-100/60 mt-4 space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {/* Left decorator column */}
+                      <div>
+                        <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">
+                          Prefijo (Izquierda):
+                        </label>
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={customPrefix}
+                            onChange={(e) => setCustomPrefix(e.target.value)}
+                            maxLength={15}
+                            placeholder="Ej. 𓆩♡𓆪"
+                            className="w-full bg-white border border-gray-200 focus:border-blue-500 rounded-xl px-3 py-2 text-xs font-sans font-bold shadow-2xs"
+                          />
+                        </div>
+                        {/* Quick preset symbols for left */}
+                        <div className="flex flex-wrap gap-1 mt-2">
+                          {["𓆩♡𓆪", "༺", "★彡", "✧*̥˚", "•´¯`•.", "⚡", "°•. ✿ .•°", "╰┈➤"].map((sym) => (
+                            <button
+                              key={sym}
+                              type="button"
+                              onClick={() => setCustomPrefix(sym)}
+                              className="text-[10px] bg-white hover:bg-blue-50 border border-gray-150 hover:border-blue-300 rounded px-1.5 py-0.5 font-bold cursor-pointer transition-all active:scale-95 text-gray-650"
+                            >
+                              {sym}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Right decorator column */}
+                      <div>
+                        <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">
+                          Sufijo (Derecha):
+                        </label>
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={customSuffix}
+                            onChange={(e) => setCustomSuffix(e.target.value)}
+                            maxLength={15}
+                            placeholder="Ej. 𓆩♡𓆪"
+                            className="w-full bg-white border border-gray-200 focus:border-blue-500 rounded-xl px-3 py-2 text-xs font-sans font-bold shadow-2xs"
+                          />
+                        </div>
+                        {/* Quick preset symbols for right */}
+                        <div className="flex flex-wrap gap-1 mt-2">
+                          {["𓆩♡𓆪", "༻", "彡★", "*̥˚✧", ".•´¯`•", "⚡", "°•. ✿ .•°", "❝"].map((sym) => (
+                            <button
+                              key={sym}
+                              type="button"
+                              onClick={() => setCustomSuffix(sym)}
+                              className="text-[10px] bg-white hover:bg-blue-50 border border-gray-150 hover:border-blue-300 rounded px-1.5 py-0.5 font-bold cursor-pointer transition-all active:scale-95 text-gray-650"
+                            >
+                              {sym}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Output display for custom decorators */}
+                    <div className="bg-blue-100/35 border border-blue-200/50 rounded-2xl p-4 flex flex-col sm:flex-row justify-between items-center gap-3">
+                      <div className="text-left w-full sm:w-auto">
+                        <span className="block text-[9px] font-bold text-blue-600 uppercase tracking-widest mb-0.5">
+                          Resultado de tu Diseño Blanco
+                        </span>
+                        <span className="font-sans font-extrabold text-base text-gray-900 break-all select-all block">
+                          {customPrefix} {generatedWhite || "ⓔⓙⓔⓜⓟⓛⓞ"} {customSuffix}
+                        </span>
+                      </div>
+                      <div className="flex gap-2 w-full sm:w-auto shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => saveFavorite(`${customPrefix} ${generatedWhite || "ⓔⓙⓔⓜⓟⓛⓞ"} ${customSuffix}`, "Diseño Blanco")}
+                          className="px-3 py-2 bg-white hover:bg-rose-50 border border-gray-200 hover:border-rose-300 text-rose-500 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1 active:scale-95"
+                          title="Guardar en favoritos"
+                        >
+                          <Heart className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleCopy("custom_white", `${customPrefix} ${generatedWhite || "ⓔⓙⓔⓜⓟⓛⓞ"} ${customSuffix}`)}
+                          className="w-full sm:w-auto px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl transition-all shadow-md hover:shadow-blue-200 cursor-pointer flex items-center justify-center gap-1.5 hover:scale-103"
+                        >
+                          <Copy className="w-3.5 h-3.5" />
+                          <span>Copiar Blanco</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="bg-blue-100/35 border border-blue-200/50 rounded-2xl p-4 flex flex-col sm:flex-row justify-between items-center gap-3">
+                      <div className="text-left w-full sm:w-auto">
+                        <span className="block text-[9px] font-bold text-indigo-600 uppercase tracking-widest mb-0.5">
+                          Resultado de tu Diseño Negro
+                        </span>
+                        <span className="font-sans font-extrabold text-base text-gray-900 break-all select-all block">
+                          {customPrefix} {generatedBlack || "🅔🅙🅔🅜🅟🅛🅞"} {customSuffix}
+                        </span>
+                      </div>
+                      <div className="flex gap-2 w-full sm:w-auto shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => saveFavorite(`${customPrefix} ${generatedBlack || "🅔🅙🅔🅜🅟🅛🅞"} ${customSuffix}`, "Diseño Negro")}
+                          className="px-3 py-2 bg-white hover:bg-rose-50 border border-gray-200 hover:border-rose-300 text-rose-500 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1 active:scale-95"
+                          title="Guardar en favoritos"
+                        >
+                          <Heart className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleCopy("custom_black", `${customPrefix} ${generatedBlack || "🅔🅙🅔🅜🅟🅛🅞"} ${customSuffix}`)}
+                          className="w-full sm:w-auto px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl transition-all shadow-md hover:shadow-indigo-200 cursor-pointer flex items-center justify-center gap-1.5 hover:scale-103"
+                        >
+                          <Copy className="w-3.5 h-3.5" />
+                          <span>Copiar Negro</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
           {/* Results Comparison Grid */}
@@ -487,9 +681,19 @@ export default function BubbleLetters({ initialText }: { initialText?: string })
                 <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">
                   Letras Burbuja Blancas (Contorno) - ⓐⓛⓔⓧ / ①②③
                 </span>
-                <span className="text-[10px] bg-blue-50 border border-blue-100/50 text-blue-700 px-2.5 py-0.5 rounded-md font-sans font-semibold">
-                  Estilo Limpio Circular
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] bg-blue-50 border border-blue-100/50 text-blue-700 px-2.5 py-0.5 rounded-md font-sans font-semibold">
+                    Estilo Limpio Circular
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => saveFavorite(generatedWhite || "①②③ ⒶⒷⒸ", "Burbuja Blanca")}
+                    className="p-1.5 rounded-lg hover:bg-blue-100/50 text-rose-500 hover:text-rose-700 transition-colors cursor-pointer"
+                    title="Guardar en favoritos"
+                  >
+                    <Heart className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
               
               <p 
@@ -520,9 +724,19 @@ export default function BubbleLetters({ initialText }: { initialText?: string })
                 <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">
                   Letras Burbuja Negras (Rellenas) - 🅐🅛🅔🅧 / ❶❷❸
                 </span>
-                <span className="text-[10px] bg-indigo-50 border border-indigo-100/50 text-indigo-700 px-2.5 py-0.5 rounded-md font-sans font-semibold">
-                  Diseño de Alto Contraste
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] bg-indigo-50 border border-indigo-100/50 text-indigo-700 px-2.5 py-0.5 rounded-md font-sans font-semibold">
+                    Diseño de Alto Contraste
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => saveFavorite(generatedBlack || "❶❷❸ 🅐🅑🅒", "Burbuja Negra")}
+                    className="p-1.5 rounded-lg hover:bg-indigo-100/50 text-rose-500 hover:text-rose-700 transition-colors cursor-pointer"
+                    title="Guardar en favoritos"
+                  >
+                    <Heart className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
               
               <p 
@@ -550,6 +764,72 @@ export default function BubbleLetters({ initialText }: { initialText?: string })
           </div>
         </div>
       </div>
+
+      {/* 1.5 Pinned Favorite Styles Section */}
+      {favorites.length > 0 && (
+        <div className="mb-10 text-left border-t border-blue-100/50 pt-8 animate-fade-in">
+          <div className="flex items-center justify-between mb-4 px-2">
+            <h3 className="font-sans font-extrabold text-gray-900 text-sm flex items-center gap-1.5">
+              <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
+              <span>Mis Nicks y Letras Guardadas ({favorites.length})</span>
+            </h3>
+            <button
+              onClick={() => {
+                setFavorites([]);
+                localStorage.removeItem("bubble_favorites");
+                showToast("Todos los favoritos han sido eliminados 🗑️");
+              }}
+              className="text-[10px] font-bold text-gray-400 hover:text-rose-600 transition-colors flex items-center gap-1 cursor-pointer"
+            >
+              <Trash2 className="w-3 h-3" />
+              <span>Eliminar todos</span>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {favorites.map((fav) => {
+              const isCopied = copiedId === `fav_${fav.id}`;
+
+              return (
+                <div
+                  key={fav.id}
+                  className="bg-radial from-amber-50/20 to-white hover:to-amber-50/10 rounded-2xl p-4.5 text-left border border-amber-200/50 shadow-xs hover:shadow-md transition-all duration-300 flex items-center justify-between"
+                >
+                  <div className="min-w-0 flex-1 pr-3">
+                    <span className="font-sans font-bold text-[9px] text-amber-800 flex items-center gap-1 mb-1">
+                      <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
+                      {fav.label}
+                    </span>
+                    <p className="font-sans font-bold text-gray-950 text-base select-all break-all tracking-wide">
+                      {fav.text}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      onClick={() => removeFavorite(fav.id)}
+                      className="p-2 rounded-xl bg-gray-50 hover:bg-rose-50 text-gray-400 hover:text-rose-600 border border-gray-100 transition-colors cursor-pointer"
+                      title="Quitar de favoritos"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => handleCopy(`fav_${fav.id}`, fav.text)}
+                      className={`px-3.5 py-2.5 rounded-xl text-xs font-bold font-sans transition-all duration-300 flex items-center gap-1 cursor-pointer hover:scale-105 active:scale-95 border ${
+                        isCopied 
+                          ? "bg-emerald-600 text-white border-emerald-700" 
+                          : "bg-amber-600 text-white border-amber-700 hover:bg-amber-500 shadow-md shadow-amber-500/10"
+                      }`}
+                    >
+                      {isCopied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Decorative Templates Row */}
       {inputText.trim() && (
@@ -638,17 +918,31 @@ export default function BubbleLetters({ initialText }: { initialText?: string })
                 <pre className="text-xs text-gray-700 font-sans whitespace-pre-line leading-relaxed min-h-[90px] text-left">
                   {preset.preview}
                 </pre>
-                <button
-                  onClick={() => handleCopy(preset.name, preset.raw)}
-                  className={`w-full py-2.5 mt-4 rounded-xl text-xs font-bold cursor-pointer transition-all duration-300 flex items-center justify-center gap-1 hover:scale-105 active:scale-95 border ${
-                    isCopied 
-                      ? "bg-emerald-600 border-emerald-700 text-white" 
-                      : "bg-white hover:bg-gray-50 text-gray-500 hover:text-gray-800 border-gray-200"
-                  }`}
-                >
-                  {isCopied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                  {isCopied ? "¡Copiado!" : "Copiar plantilla"}
-                </button>
+                <div className="flex gap-2 mt-4">
+                  <button
+                    onClick={() => {
+                      setEditingBio({
+                        title: preset.name,
+                        content: preset.raw
+                      });
+                    }}
+                    className="p-2.5 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1 active:scale-95"
+                    title="Editar plantilla en el creador"
+                  >
+                    <Edit3 className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    onClick={() => handleCopy(preset.name, preset.raw)}
+                    className={`flex-1 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all duration-300 flex items-center justify-center gap-1 hover:scale-103 active:scale-97 border ${
+                      isCopied 
+                        ? "bg-emerald-600 border-emerald-700 text-white" 
+                        : "bg-white hover:bg-gray-50 text-gray-500 hover:text-gray-850 border-gray-200 shadow-xs"
+                    }`}
+                  >
+                    {isCopied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                    <span>{isCopied ? "¡Copiado!" : "Copiar plantilla"}</span>
+                  </button>
+                </div>
               </div>
             );
           })}
@@ -825,6 +1119,170 @@ export default function BubbleLetters({ initialText }: { initialText?: string })
           Nuestra herramienta web no requiere instalar archivos de fuentes tipográficas para conseguir tus <strong className="text-blue-600 font-semibold">letras burbuja</strong>. Al introducir tu texto normal, el algoritmo del <strong className="text-blue-600 font-semibold">generador de letras burbuja</strong> traduce dinámicamente cada carácter ordinario a su respectivo símbolo para <strong className="text-blue-600 font-semibold">letras burbuja</strong> y <strong className="text-blue-600 font-semibold">letras burbuja copiar y pegar</strong>. Al tratarse de un estándar global, puedes usar tus <strong className="text-blue-600 font-semibold">letras burbuja</strong> libremente en cualquier rincón de internet con compatibilidad total de <strong className="text-blue-600 font-semibold">letras burbuja</strong>.
         </p>
       </div>
+
+      {/* Toast Alert Notifications */}
+      <AnimatePresence>
+        {toastVisible && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 30, scale: 0.95 }}
+            className="fixed bottom-6 right-6 z-55 bg-gray-900 text-white text-xs font-bold px-4 py-3 rounded-xl shadow-xl flex items-center gap-2 border border-gray-800"
+          >
+            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+            <span>{toastMessage}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Bio Editor Modal overlay */}
+      <AnimatePresence>
+        {editingBio && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 sm:p-6"
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              className="bg-white rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl border border-gray-150 flex flex-col max-h-[90vh]"
+            >
+              {/* Header */}
+              <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-5 text-white flex justify-between items-center shrink-0">
+                <div className="flex items-center gap-2">
+                  <Edit3 className="w-5 h-5" />
+                  <div>
+                    <h3 className="font-sans font-bold text-base leading-none">Creador & Editor de Bios</h3>
+                    <p className="text-[10px] text-blue-100 mt-1">Personaliza tu plantilla en tiempo real</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setEditingBio(null)}
+                  className="p-1.5 hover:bg-white/10 rounded-lg text-white transition-colors cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Body */}
+              <div className="p-6 overflow-y-auto space-y-4">
+                <div>
+                  <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">
+                    Plantilla seleccionada:
+                  </label>
+                  <p className="text-xs font-bold text-blue-700 bg-blue-50 px-3 py-1.5 rounded-lg inline-block font-sans">
+                    {editingBio.title}
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">
+                    Contenido editable de la Bio:
+                  </label>
+                  <textarea
+                    value={editingBio.content}
+                    onChange={(e) => setEditingBio({ ...editingBio, content: e.target.value })}
+                    rows={6}
+                    placeholder="Escribe tu bio o frase aquí..."
+                    className="w-full bg-gray-50 border border-gray-250 focus:border-blue-500 rounded-2xl p-4 text-xs font-mono leading-relaxed resize-y focus:ring-4 focus:ring-blue-100 outline-none"
+                  />
+                  <p className="text-[9px] text-gray-450 mt-1">
+                    Puedes escribir texto normal y luego convertir palabras utilizando los botones rápidos de abajo.
+                  </p>
+                </div>
+
+                {/* Helper tool to inject bubbles inside the active editor field */}
+                <div className="space-y-2">
+                  <span className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                    Herramientas de conversión rápida en círculos:
+                  </span>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const selected = window.getSelection()?.toString();
+                        if (selected) {
+                          const converted = bubbleWhiteFont?.generate(selected) || selected;
+                          setEditingBio({
+                            ...editingBio,
+                            content: editingBio.content.replace(selected, converted)
+                          });
+                          showToast("¡Texto seleccionado convertido a burbuja blanca! ⓐ");
+                        } else {
+                          // convert entire content
+                          const converted = bubbleWhiteFont?.generate(editingBio.content) || editingBio.content;
+                          setEditingBio({
+                            ...editingBio,
+                            content: converted
+                          });
+                          showToast("¡Toda tu bio convertida a burbuja blanca! ⓐ");
+                        }
+                      }}
+                      className="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold rounded-xl text-[10px] cursor-pointer transition-colors"
+                      title="Convierte la palabra seleccionada o todo el texto"
+                    >
+                      Convertir a ⓐⓑⓒ
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const selected = window.getSelection()?.toString();
+                        if (selected) {
+                          const converted = bubbleBlackFont?.generate(selected) || selected;
+                          setEditingBio({
+                            ...editingBio,
+                            content: editingBio.content.replace(selected, converted)
+                          });
+                          showToast("¡Texto seleccionado convertido a burbuja negra! ❶");
+                        } else {
+                          // convert entire content
+                          const converted = bubbleBlackFont?.generate(editingBio.content) || editingBio.content;
+                          setEditingBio({
+                            ...editingBio,
+                            content: converted
+                          });
+                          showToast("¡Toda tu bio convertida a burbuja negra! ❶");
+                        }
+                      }}
+                      className="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold rounded-xl text-[10px] cursor-pointer transition-colors"
+                      title="Convierte la palabra seleccionada o todo el texto"
+                    >
+                      Convertir a ❶❷❸
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Footer Actions */}
+              <div className="bg-gray-50 px-6 py-4.5 border-t border-gray-150 flex gap-3 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => saveFavorite(editingBio.content, `Bio: ${editingBio.title}`)}
+                  className="px-4 py-2.5 bg-white hover:bg-rose-50 border border-gray-200 hover:border-rose-300 text-rose-500 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 active:scale-95 shadow-2xs"
+                  title="Guardar diseño de bio"
+                >
+                  <Heart className="w-4 h-4" />
+                  <span>Favorito</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleCopy("editing_bio", editingBio.content);
+                    setEditingBio(null);
+                  }}
+                  className="flex-1 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl transition-all shadow-md hover:shadow-blue-200 cursor-pointer flex items-center justify-center gap-1.5 hover:scale-103"
+                >
+                  <Copy className="w-4 h-4" />
+                  <span>Copiar & Cerrar</span>
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
     </div>
   );

@@ -126,6 +126,8 @@ export default function HomeConverter({ initialNumber, onNavigate }: { initialNu
   // Interactive Cheque mockup and History search states
   const [searchHistoryQuery, setSearchHistoryQuery] = useState("");
   const [chequePayee, setChequePayee] = useState("Juan Pérez López");
+  const [chequeNumber, setChequeNumber] = useState("0001245");
+  const [chequeBank, setChequeBank] = useState("BANCO INTERNACIONAL DE MÉXICO");
   const [chequeDate, setChequeDate] = useState(() => {
     return new Date().toLocaleDateString("es-ES", {
       day: "2-digit",
@@ -133,6 +135,31 @@ export default function HomeConverter({ initialNumber, onNavigate }: { initialNu
       year: "numeric"
     });
   });
+
+  // Sync cheque bank based on selected currency preset
+  useEffect(() => {
+    const CURRENCY_DEFAULT_BANKS: Record<string, string> = {
+      MXN: "BANCO INTERNACIONAL DE MÉXICO",
+      USD: "FEDERAL RESERVE BANK / CHASE BANK",
+      EUR: "BANCO CENTRAL EUROPEO / DE ESPAÑA",
+      COP: "BANCO DE LA REPÚBLICA DE COLOMBIA",
+      PEN: "BANCO CENTRAL DE RESERVA DEL PERÚ",
+      ARS: "BANCO DE LA NACIÓN ARGENTINA",
+      CLP: "BANCO CENTRAL DE CHILE",
+      VES: "BANCO CENTRAL DE VENEZUELA",
+      BOB: "BANCO CENTRAL DE BOLIVIA",
+      GTQ: "BANCO DE GUATEMALA",
+      CRC: "BANCO CENTRAL DE COSTA RICA",
+      HNL: "BANCO CENTRAL DE HONDURAS",
+      NIO: "BANCO CENTRAL DE NICARAGUA",
+      PYG: "BANCO CENTRAL DE PARAGUAY",
+      UYU: "BANCO CENTRAL DE URUGUAY",
+      DOP: "BANCO DE LA REPÚBLICA DOMINICANA"
+    };
+    if (CURRENCY_DEFAULT_BANKS[currencyPreset]) {
+      setChequeBank(CURRENCY_DEFAULT_BANKS[currencyPreset]);
+    }
+  }, [currencyPreset]);
 
   // Clipboard paste handler
   const handlePaste = async () => {
@@ -385,12 +412,33 @@ export default function HomeConverter({ initialNumber, onNavigate }: { initialNu
   };
 
   const handleSpeak = () => {
-    if (!result || result.startsWith("Entrada no") || result.startsWith("Error") || speaking) return;
+    if (!result || result.startsWith("Entrada no") || result.startsWith("Error")) return;
     
     if ('speechSynthesis' in window) {
+      if (speaking) {
+        window.speechSynthesis.cancel();
+        setSpeaking(false);
+        showToast("Lectura de voz cancelada");
+        return;
+      }
+      
       setSpeaking(true);
       const utterance = new SpeechSynthesisUtterance(result);
       utterance.lang = 'es-ES';
+      
+      // Explicitly select a Spanish voice if available for correct pronunciation
+      try {
+        const voices = window.speechSynthesis.getVoices();
+        let voice = voices.find(v => v.lang === "es-ES" || v.lang === "es_ES");
+        if (!voice) voice = voices.find(v => v.lang === "es-MX" || v.lang === "es_MX");
+        if (!voice) voice = voices.find(v => v.lang.startsWith("es"));
+        if (voice) {
+          utterance.voice = voice;
+        }
+      } catch (e) {
+        // Fallback to automatic voice
+      }
+      
       utterance.onend = () => setSpeaking(false);
       utterance.onerror = () => setSpeaking(false);
       window.speechSynthesis.speak(utterance);
@@ -1043,6 +1091,34 @@ export default function HomeConverter({ initialNumber, onNavigate }: { initialNu
                     </span>
                   )}
                 </div>
+                
+                {/* Visual breakdown optimization */}
+                {(() => {
+                  const breakdown = getNumberBreakdown(inputVal);
+                  if (breakdown.length === 0) return null;
+                  return (
+                    <div className="mt-4 bg-slate-50 border border-slate-200/50 rounded-2xl p-4 text-left animate-fade-in">
+                      <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2.5">
+                        Desglose Estructural de la Cifra
+                      </span>
+                      <div className="flex flex-wrap gap-2 sm:gap-2.5">
+                        {breakdown.map((item, idx) => (
+                          <div key={idx} className="bg-white border border-slate-100 rounded-xl px-3 sm:px-4 py-2 flex flex-col min-w-[100px] sm:min-w-[120px] shadow-2xs flex-1 sm:flex-initial">
+                            <span className="text-[9px] font-bold font-sans text-slate-400 uppercase tracking-tight">
+                              {item.label}
+                            </span>
+                            <span className="font-mono font-extrabold text-slate-800 text-sm mt-0.5">
+                              {item.value}
+                            </span>
+                            <span className="text-[10px] text-blue-600 font-sans font-medium mt-0.5">
+                              {item.description}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
 
               {/* Physical Cheque / Voucher Interactive Mockup (Optimization 3) */}
@@ -1053,7 +1129,7 @@ export default function HomeConverter({ initialNumber, onNavigate }: { initialNu
                   </span>
 
                   {/* Physical Cheque Container */}
-                  <div className="bg-radial from-slate-50 to-emerald-50/40 border-2 border-emerald-600/30 rounded-2xl p-5 sm:p-6 shadow-md relative overflow-hidden text-left font-serif text-slate-800 select-none">
+                  <div className="printable-cheque bg-radial from-slate-50 to-emerald-50/40 border-2 border-emerald-600/30 rounded-2xl p-5 sm:p-6 shadow-md relative overflow-hidden text-left font-serif text-slate-800 select-none">
                     
                     {/* Decorative security wavy watermark background */}
                     <div className="absolute inset-0 opacity-5 pointer-events-none bg-[radial-gradient(#059669_1px,transparent_1px)] [background-size:16px_16px]" />
@@ -1066,23 +1142,39 @@ export default function HomeConverter({ initialNumber, onNavigate }: { initialNu
                     {/* Top row: Bank name and Cheque metadata */}
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/60 pb-3 relative z-10">
                       <div>
-                        <span className="font-bold tracking-tight text-xs sm:text-sm text-emerald-800 uppercase flex items-center gap-1.5">
-                          <Landmark className="w-4 h-4 text-emerald-600 shrink-0" />
-                          BANCO INTERNACIONAL DE MÉXICO
-                        </span>
-                        <span className="block text-[8px] uppercase tracking-widest text-slate-400 mt-0.5">Sucursal Centro • Documento de Prueba</span>
-                      </div>
-                      
-                      {/* Date details */}
-                      <div className="flex items-center space-x-2 text-right">
-                        <span className="text-[9px] uppercase tracking-wider text-slate-400 font-sans">Fecha:</span>
                         <input
                           type="text"
-                          value={chequeDate}
-                          onChange={(e) => setChequeDate(e.target.value)}
-                          className="w-24 bg-white/60 border border-slate-200 focus:border-emerald-500 focus:bg-white rounded-md px-2 py-0.5 text-center text-xs font-bold font-sans outline-hidden transition-all"
-                          placeholder="DD/MM/AAAA"
+                          value={chequeBank}
+                          onChange={(e) => setChequeBank(e.target.value)}
+                          className="font-bold tracking-tight text-xs sm:text-sm text-emerald-800 uppercase bg-transparent border-b border-dashed border-slate-250 focus:border-emerald-600 focus:outline-hidden w-64 block font-sans"
+                          placeholder="Nombre del Banco"
+                          title="Haz clic para personalizar el nombre del banco"
                         />
+                        <span className="block text-[8px] uppercase tracking-widest text-slate-400 mt-1">Sucursal Centro • Documento de Prueba</span>
+                      </div>
+                      
+                      {/* Number and Date details */}
+                      <div className="flex flex-wrap items-center gap-3 justify-end text-right">
+                        <div className="flex items-center space-x-1">
+                          <span className="text-[9px] uppercase tracking-wider text-slate-400 font-sans">No:</span>
+                          <input
+                            type="text"
+                            value={chequeNumber}
+                            onChange={(e) => setChequeNumber(e.target.value)}
+                            className="w-20 bg-white/60 border border-slate-200 focus:border-emerald-500 focus:bg-white rounded-md px-1.5 py-0.5 text-center text-xs font-bold font-sans outline-hidden transition-all font-mono"
+                            placeholder="0001245"
+                          />
+                        </div>
+                        <div className="flex items-center space-x-1">
+                          <span className="text-[9px] uppercase tracking-wider text-slate-400 font-sans">Fecha:</span>
+                          <input
+                            type="text"
+                            value={chequeDate}
+                            onChange={(e) => setChequeDate(e.target.value)}
+                            className="w-24 bg-white/60 border border-slate-200 focus:border-emerald-500 focus:bg-white rounded-md px-1.5 py-0.5 text-center text-xs font-bold font-sans outline-hidden transition-all"
+                            placeholder="DD/MM/AAAA"
+                          />
+                        </div>
                       </div>
                     </div>
 
@@ -1125,13 +1217,26 @@ export default function HomeConverter({ initialNumber, onNavigate }: { initialNu
 
                     {/* Footer Row: Legal notice and Signature section */}
                     <div className="flex items-end justify-between pt-4 border-t border-slate-200/60 mt-2 relative z-10 gap-4">
-                      <div className="max-w-[60%] space-y-1">
+                      <div className="max-w-[60%] space-y-2 text-left">
                         <span className="text-[8px] text-slate-400 uppercase font-sans leading-relaxed block">
                           No negociable • Válido únicamente como modelo de llenado de cheques o facturas con {currencyPreset}.
                         </span>
-                        <div className="inline-flex items-center space-x-1 bg-emerald-100/50 text-emerald-800 border border-emerald-200/30 px-2 py-0.5 rounded-md text-[8.5px] font-sans font-semibold">
-                          <span className="w-1 h-1 rounded-full bg-emerald-500 animate-ping" />
-                          <span>DOCUMENTO PROTEGIDO LOCALMENTE</span>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <div className="inline-flex items-center space-x-1 bg-emerald-100/50 text-emerald-800 border border-emerald-200/30 px-2 py-0.5 rounded-md text-[8.5px] font-sans font-semibold">
+                            <span className="w-1 h-1 rounded-full bg-emerald-500 animate-ping" />
+                            <span>MODELO PROTEGIDO</span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => window.print()}
+                            className="print-action-btn inline-flex items-center space-x-1 hover:bg-emerald-600 hover:text-white bg-emerald-100/60 text-emerald-800 border border-emerald-300 px-2.5 py-1 rounded-lg text-[9.5px] font-sans font-bold transition-all shadow-2xs hover:scale-102 cursor-pointer shrink-0"
+                            title="Imprimir cheque o guardar como PDF"
+                          >
+                            <svg className="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                            </svg>
+                            <span>Imprimir / PDF</span>
+                          </button>
                         </div>
                       </div>
 
@@ -1366,7 +1471,7 @@ export default function HomeConverter({ initialNumber, onNavigate }: { initialNu
           ].map((item) => (
             <a 
               key={item.num} 
-              href={`#/?n=${item.num}`}
+              href={`/?n=${item.num}`}
               onClick={(e) => {
                 e.preventDefault();
                 setInputVal(item.num);
@@ -1630,3 +1735,74 @@ export default function HomeConverter({ initialNumber, onNavigate }: { initialNu
     </div>
   );
 }
+
+interface DigitGroup {
+  label: string;
+  value: string;
+  description: string;
+}
+
+const getNumberBreakdown = (valStr: string): DigitGroup[] => {
+  // Clean number string
+  const cleaned = valStr.trim().replace(/[^0-9.-]/g, "");
+  const num = parseFloat(cleaned);
+  if (isNaN(num) || num < 0 || num > 999999999999) {
+    return [];
+  }
+  
+  const parts = cleaned.split(".");
+  const integerPart = parts[0].replace("-", "");
+  const decimalPart = parts[1] || "";
+  
+  const groups: DigitGroup[] = [];
+  
+  // Pad integer part to 12 digits (supporting up to billions)
+  const padded = integerPart.padStart(12, "0");
+  
+  const billions = padded.substring(0, 3);
+  const millions = padded.substring(3, 6);
+  const thousands = padded.substring(6, 9);
+  const units = padded.substring(9, 12);
+  
+  if (parseInt(billions) > 0) {
+    groups.push({
+      label: "Miles de Millones",
+      value: parseInt(billions).toLocaleString("es-ES"),
+      description: parseInt(billions) === 1 ? "Mil Millones" : "Miles de Millones"
+    });
+  }
+  
+  if (parseInt(millions) > 0) {
+    groups.push({
+      label: "Millones",
+      value: parseInt(millions).toLocaleString("es-ES"),
+      description: parseInt(millions) === 1 ? "Millón" : "Millones"
+    });
+  }
+  
+  if (parseInt(thousands) > 0) {
+    groups.push({
+      label: "Miles",
+      value: parseInt(thousands).toLocaleString("es-ES"),
+      description: "Mil / Miles"
+    });
+  }
+  
+  if (parseInt(units) > 0 || groups.length === 0) {
+    groups.push({
+      label: "Unidades",
+      value: parseInt(units).toLocaleString("es-ES"),
+      description: "Unidades"
+    });
+  }
+  
+  if (decimalPart) {
+    groups.push({
+      label: "Decimales",
+      value: decimalPart.substring(0, 2),
+      description: "Centavos / Céntimos"
+    });
+  }
+  
+  return groups;
+};

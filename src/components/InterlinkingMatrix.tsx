@@ -9,7 +9,7 @@ export default function InterlinkingMatrix({ currentPath }: InterlinkingMatrixPr
   const tools = [
     {
       id: "/",
-      href: "#/",
+      href: "/",
       title: "Convertidor de Números a Letras",
       desc: "Herramienta general para transcribir cualquier cifra o número entero y decimal a palabras en español.",
       icon: Keyboard,
@@ -17,7 +17,7 @@ export default function InterlinkingMatrix({ currentPath }: InterlinkingMatrixPr
     },
     {
       id: "/cantidad-con-letra",
-      href: "#/cantidad-con-letra",
+      href: "/cantidad-con-letra",
       title: "Conversor de Cantidad con Letra",
       desc: "Escribe cantidades de dinero en letras con el formato oficial para llenar cheques, facturas y contratos.",
       icon: Receipt,
@@ -25,7 +25,7 @@ export default function InterlinkingMatrix({ currentPath }: InterlinkingMatrixPr
     },
     {
       id: "/como-se-escribe",
-      href: "#/como-se-escribe",
+      href: "/como-se-escribe",
       title: "Guía de Ortografía RAE de Números",
       desc: "Aprende las reglas ortográficas oficiales para escribir números complejos, cien o ciento, veintiuno y más.",
       icon: BookOpen,
@@ -33,7 +33,7 @@ export default function InterlinkingMatrix({ currentPath }: InterlinkingMatrixPr
     },
     {
       id: "/letras-aesthetic",
-      href: "#/letras-aesthetic",
+      href: "/letras-aesthetic",
       title: "Letras Aesthetic Copiar y Pegar",
       desc: "Genera fuentes bonitas, cursivas, góticas y símbolos mágicos para personalizar tus redes sociales.",
       icon: Sparkles,
@@ -41,7 +41,7 @@ export default function InterlinkingMatrix({ currentPath }: InterlinkingMatrixPr
     },
     {
       id: "/letras-burbuja",
-      href: "#/letras-burbuja",
+      href: "/letras-burbuja",
       title: "Generador de Letras Burbuja",
       desc: "Transforma tus frases en elegantes letras con círculos blancos y negros para nombres de clanes y nicks.",
       icon: CircleDot,
@@ -51,17 +51,17 @@ export default function InterlinkingMatrix({ currentPath }: InterlinkingMatrixPr
 
   const featuredArticles = [
     {
-      href: "#/blog/guia-convertir-numeros-a-letras-rae-finanzas",
+      href: "/blog/guia-convertir-numeros-a-letras-rae-finanzas",
       title: "Guía Suprema: Cómo Convertir Números a Letras en Español",
       desc: "Las reglas ortográficas completas de la RAE, la redacción comercial y el uso del 'un mil' ante 'mil'."
     },
     {
-      href: "#/blog/arte-letras-burbuja-tipografia-circular-copiar-pegar",
+      href: "/blog/arte-letras-burbuja-tipografia-circular-copiar-pegar",
       title: "El Arte de las Letras Burbuja en Redes Sociales",
       desc: "Cómo funciona la codificación Unicode de los círculos y consejos de SEO para tus biografías."
     },
     {
-      href: "#/blog/letras-aesthetic-fuentes-pequenas-instagram-tiktok",
+      href: "/blog/letras-aesthetic-fuentes-pequenas-instagram-tiktok",
       title: "Guía de Letras Aesthetic y Fuentes Pequeñas",
       desc: "Aprende a captar atención visual usando letras pequeñas versalitas, superíndices y símbolos en tu bio."
     }

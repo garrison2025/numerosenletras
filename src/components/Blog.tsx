@@ -216,7 +216,7 @@ export const BLOG_POSTS: BlogPost[] = [
         <div class="my-6">
           <h2 class="text-2xl font-bold text-gray-900 border-b pb-2 mb-4">1. La Ciencia Detrás de las Letras Burbuja: El Estándar Unicode</h2>
           <p class="mb-4">
-            Contrario a la creencia popular, un generador de <a href="https://numerosenletras.org/#/letras-burbuja" class="text-blue-600 hover:text-blue-800 font-semibold underline">letras burbuja</a> no altera los archivos de fuentes de tu teléfono ni requiere instalar complejos programas de terceros. Lo que realmente hace es mapear las letras normales del alfabeto latino hacia un bloque especial del estándar <a href="https://home.unicode.org/" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline inline-flex items-center gap-1 font-semibold">Unicode Consortium <ArrowUpRight class="w-3 h-3"/></a>.
+            Contrario a la creencia popular, un generador de <a href="https://numerosenletras.org/letras-burbuja" class="text-blue-600 hover:text-blue-800 font-semibold underline">letras burbuja</a> no altera los archivos de fuentes de tu teléfono ni requiere instalar complejos programas de terceros. Lo que realmente hace es mapear las letras normales del alfabeto latino hacia un bloque especial del estándar <a href="https://home.unicode.org/" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline inline-flex items-center gap-1 font-semibold">Unicode Consortium <ArrowUpRight class="w-3 h-3"/></a>.
           </p>
           <p class="mb-4">
             Unicode es la especificación técnica universal de codificación que permite a computadoras de todo el planeta interpretar y mostrar texto de la misma manera, sin importar el idioma. Dentro de este mapa de miles de símbolos se encuentra un bloque llamado <strong>"Alfanuméricos Encirculados" (Enclosed Alphanumerics)</strong>.
@@ -253,7 +253,7 @@ export const BLOG_POSTS: BlogPost[] = [
             Para convertir un texto monótono a letras con burbujas estéticas utilizando <a href="https://numerosenletras.org" class="text-blue-600 hover:text-blue-800 font-bold underline">numerosenletras.org</a>, simplemente debes seguir estos sencillos pasos:
           </p>
           <ol class="list-decimal pl-6 space-y-2 mb-4">
-            <li>Accede a la pestaña <a href="https://numerosenletras.org/#/letras-burbuja" class="text-blue-600 hover:underline font-bold">Letras Burbuja</a> en el menú de navegación principal de nuestra web.</li>
+            <li>Accede a la pestaña <a href="https://numerosenletras.org/letras-burbuja" class="text-blue-600 hover:underline font-bold">Letras Burbuja</a> en el menú de navegación principal de nuestra web.</li>
             <li>Escribe tu frase, nombre de usuario o hashtag en la caja de texto interactiva superior.</li>
             <li>Utiliza las opciones avanzadas para seleccionar si deseas forzar todo a mayúsculas o minúsculas para un acabado simétrico impecable.</li>
             <li>Habilita la casilla <strong>"Puntos estéticos (•)"</strong> para que el generador reemplace automáticamente los espacios vacíos por puntos de diseño japonés, evitando que los círculos queden excesivamente distanciados entre sí.</li>
@@ -271,7 +271,7 @@ export const BLOG_POSTS: BlogPost[] = [
             Si escribes tu palabra clave principal de tu negocio enteramente en letras burbuja (por ejemplo: 🅜🅐🅡🅚🅔🅣🅘🅝🅖), es probable que el motor de búsqueda interno de la plataforma no logre emparejar esos caracteres especiales con las búsquedas convencionales que los usuarios hacen escribiendo en sus teclados estándar.
           </p>
           <p class="mb-4">
-            <strong>¿La estrategia inteligente?</strong> Conserva tu nombre principal y palabras clave centrales de tu nicho en tipografía regular estándar de alta accesibilidad, y reserva las <a href="https://numerosenletras.org/#/letras-aesthetic" class="text-blue-600 hover:underline font-bold">letras aesthetic copiar y pegar</a> para llamados a la acción (CTA), eslóganes, secciones secundarias o para destacar enlaces importantes en tu biografía.
+            <strong>¿La estrategia inteligente?</strong> Conserva tu nombre principal y palabras clave centrales de tu nicho en tipografía regular estándar de alta accesibilidad, y reserva las <a href="https://numerosenletras.org/letras-aesthetic" class="text-blue-600 hover:underline font-bold">letras aesthetic copiar y pegar</a> para llamados a la acción (CTA), eslóganes, secciones secundarias o para destacar enlaces importantes en tu biografía.
           </p>
         </div>
 
@@ -347,7 +347,7 @@ export const BLOG_POSTS: BlogPost[] = [
             El mayor temor al utilizar letras de fantasía es que algunos usuarios entren a tu perfil y terminen viendo rectángulos con signos de interrogación o cuadrados vacíos (popularmente conocidos como "tofus"). Para evitar este grave fallo de diseño y asegurar la accesibilidad, sigue las siguientes recomendaciones técnicas:
           </p>
           <ul class="list-disc pl-6 space-y-2 mb-4">
-            <li><strong>Normaliza los Caracteres Especiales:</strong> Las lenguas romances como el español utilizan frecuentemente acentos ortográficos (á, é, í, ó, ú) y la letra eñe (ñ). Debido a que la mayoría de sistemas de codificación de fuentes artísticas nacieron bajo especificaciones en inglés, es común que no cuenten con las versiones con tildes de estas letras. Al usar la opción de <strong>"Quitar Acentos / Ñ"</strong> en <a href="https://numerosenletras.org/#/letras-aesthetic" class="text-blue-600 hover:underline font-bold">numerosenletras.org</a>, el sistema sustituye á por a y ñ por n antes de hacer la conversión de estilo, garantizando que el diseño final no se rompa visualmente.</li>
+            <li><strong>Normaliza los Caracteres Especiales:</strong> Las lenguas romances como el español utilizan frecuentemente acentos ortográficos (á, é, í, ó, ú) y la letra eñe (ñ). Debido a que la mayoría de sistemas de codificación de fuentes artísticas nacieron bajo especificaciones en inglés, es común que no cuenten con las versiones con tildes de estas letras. Al usar la opción de <strong>"Quitar Acentos / Ñ"</strong> en <a href="https://numerosenletras.org/letras-aesthetic" class="text-blue-600 hover:underline font-bold">numerosenletras.org</a>, el sistema sustituye á por a y ñ por n antes de hacer la conversión de estilo, garantizando que el diseño final no se rompa visualmente.</li>
             <li><strong>Mantén la Accesibilidad Web:</strong> Los lectores de pantalla que utilizan las personas con discapacidades visuales para navegar por internet no siempre logran interpretar con facilidad los caracteres matemáticos especiales de Unicode. Utiliza los estilos tipográficos alternativos únicamente para fines estéticos, decorativos o de énfasis comercial, y nunca para escribir textos de vital importancia sobre salud, leyes, o instrucciones críticas de tu negocio.</li>
           </ul>
         </div>
@@ -358,7 +358,7 @@ export const BLOG_POSTS: BlogPost[] = [
             Nuestra interfaz inteligente de conversión de fuentes te permite agilizar tu flujo creativo en solo unos instantes:
           </p>
           <ol class="list-decimal pl-6 space-y-2 mb-4">
-            <li>Entra en <a href="https://numerosenletras.org/#/letras-aesthetic" class="text-blue-600 hover:underline font-bold">letras aesthetic copiar y pegar</a>.</li>
+            <li>Entra en <a href="https://numerosenletras.org/letras-aesthetic" class="text-blue-600 hover:underline font-bold">letras aesthetic copiar y pegar</a>.</li>
             <li>Escribe tu biografía o eslogan directamente en el área de ingreso de texto.</li>
             <li>Añade símbolos de estrellas (★, ✧, ✦) utilizando nuestra caja interactiva de inserción de símbolos en la parte inferior para complementar la composición.</li>
             <li>Observa las previsualizaciones instantáneas que se actualizan dinámicamente según ajustas el tamaño de previsualización para comprobar cómo lucirá en dispositivos más pequeños.</li>

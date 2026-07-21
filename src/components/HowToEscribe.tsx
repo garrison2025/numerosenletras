@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { convertNumberToLetters } from "../utils/numberToLetters";
 import { 
   BookOpen, 
@@ -15,7 +15,8 @@ import {
   CheckCircle,
   Hash,
   ListOrdered,
-  AlertCircle
+  AlertCircle,
+  Coins
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
@@ -30,6 +31,37 @@ interface CommonNumLink {
   label: string;
   text: string;
 }
+
+// Robust parser supporting Spanish dot/comma styles and American styles
+function parseSpanishNumber(str: string): number {
+  let cleaned = str.trim();
+  if (!cleaned) return NaN;
+  
+  const lastComma = cleaned.lastIndexOf(',');
+  const lastDot = cleaned.lastIndexOf('.');
+  
+  if (lastComma > lastDot) {
+    // Comma is the decimal separator. Remove dots, replace comma with dot.
+    cleaned = cleaned.replace(/\./g, "").replace(/,/g, ".");
+  } else if (lastDot > lastComma) {
+    // Dot is the decimal separator. Remove commas.
+    cleaned = cleaned.replace(/,/g, "");
+  } else {
+    // Only one separator type or none.
+    if (cleaned.includes(",") && !cleaned.includes(".")) {
+      cleaned = cleaned.replace(/,/g, ".");
+    }
+  }
+  return parseFloat(cleaned);
+}
+
+const CURRENCY_PRESETS = [
+  { id: "pesos", label: "Pesos ($)", name: "pesos", cent: "centavos" },
+  { id: "euros", label: "Euros (€)", name: "euros", cent: "céntimos" },
+  { id: "dolares", label: "Dólares ($)", name: "dólares", cent: "centavos" },
+  { id: "soles", label: "Soles (S/.)", name: "soles", cent: "céntimos" },
+  { id: "custom", label: "Personalizado ✎", name: "", cent: "" }
+];
 
 // Helper to convert integer (1-3999) to Roman Numerals
 function toRoman(num: number): string {
@@ -113,6 +145,137 @@ function getSpellingRule(num: number): string {
   return "Consulte las reglas generales de concordancia de género y números según la Real Academia Española (RAE).";
 }
 
+interface QuizQuestion {
+  num: number;
+  answer: string;
+  tip: string;
+}
+
+function generateDynamicQuestions(): QuizQuestion[] {
+  const categories = [
+    // Cat 1: 16-19 (Agudas con/sin tilde)
+    () => {
+      const nums = [16, 17, 18, 19];
+      const num = nums[Math.floor(Math.random() * nums.length)];
+      return {
+        num,
+        answer: convertNumberToLetters(num, { gender: 'M' }).toLowerCase(),
+        tip: num === 16 
+          ? "Se escribe en una sola palabra ('dieci-') y lleva tilde en la última 'e' ('dieciséis') por ser palabra aguda terminada en 's'." 
+          : `Se escribe refundido en una sola palabra: fusión de diez y la unidad ('dieciocho', 'diecisiete', 'diecinueve').`
+      };
+    },
+    // Cat 2: 21-29 (Agudas con tilde: 22, 23, 26; o sin tilde: 21, 24, 25, 27, 28, 29)
+    () => {
+      const nums = [21, 22, 23, 24, 25, 26, 28, 29];
+      const num = nums[Math.floor(Math.random() * nums.length)];
+      const answer = convertNumberToLetters(num, { gender: 'M' }).toLowerCase();
+      let tip = "Los números de la década del 20 se escriben en una sola palabra unificada ('veinti-').";
+      if (num === 22) tip += " Lleva tilde en la 'o' ('veintidós') por ser palabra aguda terminada en 's'.";
+      else if (num === 23) tip += " Lleva tilde en la 'e' ('veintitrés') por ser palabra aguda terminada en 's'.";
+      else if (num === 26) tip += " Lleva tilde en la 'e' ('veintiséis') por ser palabra aguda terminada en 's'.";
+      else if (num === 21) tip += " Se escribe 'veintiuno' cuando se cuenta de forma aislada, o 'veintiún' antes de un sustantivo masculino.";
+      else tip += " No lleva tilde porque es una palabra llana terminada en vocal ('veinticuatro', 'veintiocho').";
+      return { num, answer, tip };
+    },
+    // Cat 3: Decenas y unidades separadas (31-99)
+    () => {
+      const tens = [30, 40, 50, 60, 70, 80, 90];
+      const units = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+      const t = tens[Math.floor(Math.random() * tens.length)];
+      const u = units[Math.floor(Math.random() * units.length)];
+      const num = t + u;
+      const answer = convertNumberToLetters(num, { gender: 'M' }).toLowerCase();
+      return {
+        num,
+        answer,
+        tip: `A partir del número 31, las decenas y unidades se escriben obligatoriamente por separado unidas con la conjunción 'y' (ej. '${answer}'). Escribirlo todo junto es un error común.`
+      };
+    },
+    // Cat 4: Irregularidades de centenas (500, 700, 900)
+    () => {
+      const num = [500, 700, 900][Math.floor(Math.random() * 3)];
+      const answer = convertNumberToLetters(num, { gender: 'M' }).toLowerCase();
+      let tip = "";
+      if (num === 500) tip = "¡Forma irregular absoluta! No se escribe 'cincocientos', sino 'quinientos'.";
+      else if (num === 700) tip = "Irregularidad ortográfica: se escribe con 'e', no con 'ie' (setecientos, no 'sietecientos').";
+      else if (num === 900) tip = "Irregularidad ortográfica: se escribe con 'o', no con 'ue' (novecientos, no 'nuevecientos').";
+      return { num, answer, tip };
+    },
+    // Cat 5: Centenas normales (100, 200, 300, 400, 600, 800)
+    () => {
+      const nums = [100, 200, 300, 400, 600, 800];
+      const num = nums[Math.floor(Math.random() * nums.length)];
+      const answer = convertNumberToLetters(num, { gender: 'M' }).toLowerCase();
+      let tip = "";
+      if (num === 100) tip = "Se escribe estrictamente 'cien' para la cantidad exacta. Se transforma en 'ciento' si va seguido de otras cifras menores (ej. ciento uno).";
+      else tip = `Se escribe en una sola palabra uniendo la unidad con 'cientos' ('${answer}'). Recuerda la concordancia de género si acompaña a un sustantivo femenino (ej: doscientas).`;
+      return { num, answer, tip };
+    },
+    // Cat 6: Centenas con decenas (e.g. 101, 105, 125, 116)
+    () => {
+      const remainders = [1, 5, 16, 22, 23, 35, 42];
+      const rem = remainders[Math.floor(Math.random() * remainders.length)];
+      const num = 100 + rem;
+      const answer = convertNumberToLetters(num, { gender: 'M' }).toLowerCase();
+      return {
+        num,
+        answer,
+        tip: `Para cantidades superiores a 100, se usa la forma 'ciento' seguida de la escritura de la cifra restante ('${answer}').`
+      };
+    },
+    // Cat 7: Millares (1000 o múltiplos)
+    () => {
+      const factors = [1, 2, 5, 10, 21, 30];
+      const f = factors[Math.floor(Math.random() * factors.length)];
+      const num = f * 1000;
+      const answer = convertNumberToLetters(num, { gender: 'M' }).toLowerCase();
+      let tip = "El millar ('mil') es un adjetivo invariable en español.";
+      if (f === 1) tip += " La RAE aconseja escribir simplemente 'mil', no 'un mil', ya que este último es redundante en la lengua general.";
+      else if (f === 21) tip += " Se escribe 'veintiún mil' (con tilde) antes de mil, perdiendo la vocal final de veintiuno por apócope.";
+      return { num, answer, tip };
+    },
+    // Cat 8: Millones (1,000,000 o múltiplos)
+    () => {
+      const factors = [1, 2, 3, 5, 10];
+      const f = factors[Math.floor(Math.random() * factors.length)];
+      const num = f * 1000000;
+      const answer = convertNumberToLetters(num, { gender: 'M' }).toLowerCase();
+      let tip = "La palabra 'millón' o 'millones' es un sustantivo masculino, por lo que exige concordancia (un millón, dos millones).";
+      if (f === 1) tip += " Se escribe con tilde en singular ('un millón') pero se escribe sin tilde en plural ('millones').";
+      return { num, answer, tip };
+    },
+    // Cat 9: Números compuestos complejos (ej: 1525, 2315, 3450)
+    () => {
+      const pool = [1525, 2315, 3450, 5035, 10700, 21000];
+      const num = pool[Math.floor(Math.random() * pool.length)];
+      const answer = convertNumberToLetters(num, { gender: 'M' }).toLowerCase();
+      let tip = `Para números compuestos, se van aplicando sucesivamente las reglas de cada orden de magnitud: millares, centenas, decenas y unidades ('${answer}').`;
+      if (num === 21000) tip += " Note el uso de 'veintiún mil' con tilde en la 'u'.";
+      return { num, answer, tip };
+    },
+    // Cat 10: Tricky cases (zero, or very specific numbers like 11, 12, 15)
+    () => {
+      const tricky = [0, 11, 12, 13, 14, 15];
+      const num = tricky[Math.floor(Math.random() * tricky.length)];
+      const answer = convertNumberToLetters(num, { gender: 'M' }).toLowerCase();
+      let tip = "";
+      if (num === 0) tip = "El cero es el nombre del número de valor nulo. Se escribe con 'c'.";
+      else tip = `Los números del 11 al 15 tienen nombres propios independientes heredados directamente del latín ('${answer}').`;
+      return { num, answer, tip };
+    }
+  ];
+
+  const questions: QuizQuestion[] = categories.map(catFn => catFn());
+  
+  for (let i = questions.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [questions[i], questions[j]] = [questions[j], questions[i]];
+  }
+
+  return questions;
+}
+
 const QUIZ_QUESTIONS = [
   { num: 16, answer: "dieciséis", tip: "Se escribe en una sola palabra con 'c' (dieci-) y lleva tilde en la última 'e' por ser palabra aguda terminada en 's'." },
   { num: 22, answer: "veintidós", tip: "Se escribe en una sola palabra y lleva tilde en la 'o' por ser palabra aguda terminada en 's'." },
@@ -140,17 +303,39 @@ export default function HowToEscribe({
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [activeGuideTab, setActiveGuideTab] = useState<'rules' | 'ordinals' | 'romans' | 'sitemap' | 'quiz'>('rules');
 
+  // Dynamic currency states
+  const [selectedCurrency, setSelectedCurrency] = useState<string>("pesos");
+  const [customCurrencyName, setCustomCurrencyName] = useState<string>("pesos");
+  const [customCurrencyCentName, setCustomCurrencyCentName] = useState<string>("centavos");
+
+  // Floating Toast alert state
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastVisible, setToastVisible] = useState(false);
+
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setToastVisible(true);
+    setTimeout(() => {
+      setToastVisible(false);
+    }, 2500);
+  };
+
   // Quiz states
+  const [currentQuestions, setCurrentQuestions] = useState<QuizQuestion[]>([]);
   const [quizIndex, setQuizIndex] = useState(0);
   const [userAnswer, setUserAnswer] = useState("");
   const [showQuizFeedback, setShowQuizFeedback] = useState(false);
   const [quizScore, setQuizScore] = useState(0);
   const [quizFinished, setQuizFinished] = useState(false);
 
+  useEffect(() => {
+    setCurrentQuestions(generateDynamicQuestions());
+  }, []);
+
   const faqs: FAQItem[] = [
     {
       q: "¿Cómo se escribe con letra el número 100?",
-      a: "Saber **cómo se escribe con letra** el 100 es una de las dudas más comunes. Se escribe estrictamente como **'cien'** cuando expresa la cantidad exacta de 100 (ej: *cien personas*, *cien euros*). Sin embargo, se transforma en **'ciento'** cuando va seguido de otros números menores (ej: *ciento uno*, *ciento cincuenta*, *doscientos*).",
+      a: "Saber **cómo se escribe con letra** el 100 es una de las dudas más comunes. Se escribe estrictamente como **'cien'** cuando expresa la cantidad exacta of 100 (ej: *cien personas*, *cien euros*). Sin embargo, se transforma en **'ciento'** cuando va seguido de otros números menores (ej: *ciento uno*, *ciento cincuenta*, *doscientos*).",
       keyword: "cómo se escribe con letra 100 cien ciento"
     },
     {
@@ -218,6 +403,7 @@ export default function HowToEscribe({
   const triggerCopy = (id: string, text: string) => {
     navigator.clipboard.writeText(text);
     setCopiedId(id);
+    showToast(`¡Copiado!: "${text.length > 35 ? text.substring(0, 35) + '...' : text}" 📋✨`);
     setTimeout(() => setCopiedId(null), 1500);
   };
 
@@ -230,22 +416,42 @@ export default function HowToEscribe({
            faq.keyword.toLowerCase().includes(query);
   });
 
-  // Parse and calculate values for live checker
-  const cleanLiveNumStr = liveNumber.replace(/[^0-9.]/g, "");
-  const parsedLiveNum = parseFloat(cleanLiveNumStr);
+  // Parse and calculate values for live checker using robust Spanish/English parser
+  const parsedLiveNum = parseSpanishNumber(liveNumber);
   const isValidLiveNum = !isNaN(parsedLiveNum) && parsedLiveNum >= 0 && parsedLiveNum < 1000000000000;
+  const cleanLiveNumStr = isValidLiveNum ? String(parsedLiveNum) : "";
 
   // Real-time generated values
   const liveMasc = isValidLiveNum ? convertNumberToLetters(parsedLiveNum, { gender: 'M' }) : "";
   const liveFem = isValidLiveNum ? convertNumberToLetters(parsedLiveNum, { gender: 'F' }) : "";
   const liveRoman = isValidLiveNum && Number.isInteger(parsedLiveNum) ? toRoman(parsedLiveNum) : "N/A (Requiere entero menor de 4,000)";
   const liveOrdinal = isValidLiveNum && Number.isInteger(parsedLiveNum) ? toOrdinal(parsedLiveNum) : "N/A (Requiere entero entre 1 y 100)";
+  
+  // Determine current active currency name and cent name
+  const currentCurrencyName = selectedCurrency === "custom" 
+    ? customCurrencyName 
+    : (CURRENCY_PRESETS.find(c => c.id === selectedCurrency)?.name || "pesos");
+    
+  const currentCurrencyCentName = selectedCurrency === "custom"
+    ? customCurrencyCentName
+    : (CURRENCY_PRESETS.find(c => c.id === selectedCurrency)?.cent || "centavos");
+
   const liveFinancial = isValidLiveNum ? convertNumberToLetters(parsedLiveNum, {
     gender: 'N',
     isCurrency: true,
-    currencyName: "pesos",
+    currencyName: currentCurrencyName,
+    currencyCentName: currentCurrencyCentName,
     formatFinancial: true
   }) : "";
+
+  const liveFinancialWithCents = isValidLiveNum ? convertNumberToLetters(parsedLiveNum, {
+    gender: 'N',
+    isCurrency: true,
+    currencyName: currentCurrencyName,
+    currencyCentName: currentCurrencyCentName,
+    formatFinancial: false
+  }) : "";
+
   const liveRuleText = isValidLiveNum && Number.isInteger(parsedLiveNum) ? getSpellingRule(parsedLiveNum) : "Introduce un número entero para ver las reglas ortográficas específicas recomendadas por la RAE.";
 
   return (
@@ -287,6 +493,70 @@ export default function HowToEscribe({
               onChange={(e) => setLiveNumber(e.target.value)}
             />
           </div>
+        </div>
+
+        {/* Currency Customization block */}
+        <div className="bg-white/45 border border-blue-100/50 rounded-2xl p-4.5 mb-6 flex flex-col gap-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <Coins className="w-4 h-4 text-amber-500 animate-pulse" />
+              <span className="text-xs font-bold text-gray-700 font-sans">
+                Ajustes de Divisa para Formato Financiero:
+              </span>
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {CURRENCY_PRESETS.map((preset) => (
+                <button
+                  key={preset.id}
+                  onClick={() => setSelectedCurrency(preset.id)}
+                  className={`px-3 py-1.5 text-xs font-bold rounded-xl border transition-all cursor-pointer ${
+                    selectedCurrency === preset.id
+                      ? "bg-blue-600 text-white border-blue-600 shadow-sm"
+                      : "bg-white text-gray-500 border-gray-200 hover:bg-gray-50 hover:text-gray-700"
+                  }`}
+                >
+                  {preset.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* If Custom is selected, show input fields */}
+          <AnimatePresence>
+            {selectedCurrency === "custom" && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className="overflow-hidden grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1"
+              >
+                <div>
+                  <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">
+                    Nombre de la Moneda (Plural)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Ej: dólares, quetzales, pesos"
+                    value={customCurrencyName}
+                    onChange={(e) => setCustomCurrencyName(e.target.value)}
+                    className="w-full bg-white border border-gray-200 focus:border-blue-500 rounded-xl px-3 py-2 text-xs font-semibold text-gray-700 outline-hidden"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">
+                    Nombre de la Fracción (Plural)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Ej: centavos, céntimos"
+                    value={customCurrencyCentName}
+                    onChange={(e) => setCustomCurrencyCentName(e.target.value)}
+                    className="w-full bg-white border border-gray-200 focus:border-blue-500 rounded-xl px-3 py-2 text-xs font-semibold text-gray-700 outline-hidden"
+                  />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         {isValidLiveNum ? (
@@ -337,7 +607,7 @@ export default function HowToEscribe({
               <div className="bg-white/80 p-4.5 rounded-2xl border border-gray-100/80 hover:border-blue-100/60 shadow-xs group transition-all flex items-center justify-between gap-4">
                 <div className="space-y-1">
                   <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block font-mono">
-                    Formato Cheque y Facturas
+                    Formato Cheque y Facturas (Abreviado)
                   </span>
                   <p className="text-xs sm:text-sm font-semibold text-gray-700 italic leading-tight">
                     {liveFinancial}
@@ -349,6 +619,25 @@ export default function HowToEscribe({
                   title="Copiar"
                 >
                   {copiedId === "financial" ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
+                </button>
+              </div>
+
+              {/* Financial Cents Card */}
+              <div className="bg-white/80 p-4.5 rounded-2xl border border-gray-100/80 hover:border-blue-100/60 shadow-xs group transition-all flex items-center justify-between gap-4">
+                <div className="space-y-1">
+                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block font-mono">
+                    Formato Moneda Completo (Fracción Escrita)
+                  </span>
+                  <p className="text-xs sm:text-sm font-semibold text-gray-700 italic leading-tight">
+                    {liveFinancialWithCents}
+                  </p>
+                </div>
+                <button
+                  onClick={() => triggerCopy("financialWithCents", liveFinancialWithCents)}
+                  className="p-2.5 bg-gray-50 hover:bg-blue-50 rounded-xl text-gray-400 hover:text-blue-600 transition-all cursor-pointer flex-shrink-0"
+                  title="Copiar"
+                >
+                  {copiedId === "financialWithCents" ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
                 </button>
               </div>
 
@@ -608,137 +897,141 @@ export default function HowToEscribe({
             </div>
           )}
 
-          {activeGuideTab === 'quiz' && (
-            <div className="space-y-6">
-              <div className="flex items-center justify-between border-b border-gray-100 pb-4 flex-wrap gap-2">
-                <h3 className="font-sans font-bold text-gray-900 text-base flex items-center gap-2">
-                  <Award className="w-5 h-5 text-indigo-600" />
-                  <span>Cuestionario de Ortografía de Números RAE</span>
-                </h3>
-                <span className="text-xs bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-full font-bold">
-                  Pregunta {quizFinished ? QUIZ_QUESTIONS.length : quizIndex + 1} de {QUIZ_QUESTIONS.length}
-                </span>
-              </div>
-
-              {quizFinished ? (
-                <div className="text-center py-8 space-y-4">
-                  <div className="inline-flex p-4 rounded-full bg-indigo-50 text-indigo-600 mb-2">
-                    <Award className="w-12 h-12" />
-                  </div>
-                  <h4 className="font-sans font-black text-gray-900 text-2xl">¡Quiz Completado!</h4>
-                  <p className="text-gray-600 text-sm max-w-md mx-auto font-sans">
-                    Has obtenido una puntuación de <strong className="text-indigo-600">{quizScore} / {QUIZ_QUESTIONS.length}</strong> aciertos.
-                  </p>
-                  
-                  <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100 max-w-md mx-auto text-xs text-gray-500 font-sans">
-                    {quizScore === QUIZ_QUESTIONS.length ? (
-                      <p className="text-indigo-700 font-bold">🎉 ¡Excelente! Eres un maestro absoluto de la ortografía de números según las normas de la Real Academia Española (RAE).</p>
-                    ) : quizScore >= 7 ? (
-                      <p className="text-emerald-700 font-bold">👍 ¡Muy bien hecho! Tienes un gran dominio ortográfico. Solo te faltaron algunos detalles menores.</p>
-                    ) : (
-                      <p className="text-blue-700 font-bold">💡 ¡Buen intento! Te recomendamos repasar nuestra sección de "Reglas de Oro" y volver a intentarlo para perfeccionar tu dominio.</p>
-                    )}
-                  </div>
-
-                  <button
-                    onClick={() => {
-                      setQuizIndex(0);
-                      setQuizScore(0);
-                      setUserAnswer("");
-                      setShowQuizFeedback(false);
-                      setQuizFinished(false);
-                    }}
-                    className="mt-4 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-sans font-bold text-xs sm:text-sm rounded-xl shadow-md shadow-blue-500/10 cursor-pointer transition-all"
-                  >
-                    Reiniciar Cuestionario
-                  </button>
+          {activeGuideTab === 'quiz' && (() => {
+            const activeQuestions = currentQuestions.length > 0 ? currentQuestions : QUIZ_QUESTIONS;
+            return (
+              <div className="space-y-6">
+                <div className="flex items-center justify-between border-b border-gray-100 pb-4 flex-wrap gap-2">
+                  <h3 className="font-sans font-bold text-gray-900 text-base flex items-center gap-2">
+                    <Award className="w-5 h-5 text-indigo-600" />
+                    <span>Cuestionario de Ortografía de Números RAE</span>
+                  </h3>
+                  <span className="text-xs bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-full font-bold">
+                    Pregunta {quizFinished ? activeQuestions.length : quizIndex + 1} de {activeQuestions.length}
+                  </span>
                 </div>
-              ) : (
-                <div className="space-y-6">
-                  <div className="bg-slate-50 border border-slate-100 p-6 rounded-2xl text-center">
-                    <p className="text-xs font-mono font-bold text-gray-400 uppercase tracking-widest mb-1">Escribe con letras el siguiente número:</p>
-                    <h5 className="font-mono font-black text-gray-900 text-4xl py-3">
-                      {QUIZ_QUESTIONS[quizIndex].num}
-                    </h5>
-                    <p className="text-xs text-gray-500 italic font-sans">Escribe tu respuesta en minúsculas y sin espacios innecesarios.</p>
-                  </div>
 
-                  <form 
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      if (showQuizFeedback) return;
-                      const cleanedAnswer = userAnswer.trim().toLowerCase();
-                      const isCorrect = cleanedAnswer === QUIZ_QUESTIONS[quizIndex].answer;
-                      if (isCorrect) {
-                        setQuizScore((prev) => prev + 1);
-                      }
-                      setShowQuizFeedback(true);
-                    }}
-                    className="space-y-4"
-                  >
-                    <div className="text-left">
-                      <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 font-sans">Tu Respuesta:</label>
-                      <input
-                        type="text"
-                        disabled={showQuizFeedback}
-                        value={userAnswer}
-                        onChange={(e) => setUserAnswer(e.target.value)}
-                        placeholder="Ej: veintitrés"
-                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-sans focus:outline-hidden focus:border-blue-500 transition disabled:opacity-75 font-semibold text-gray-900"
-                        required
-                        autoFocus
-                      />
+                {quizFinished ? (
+                  <div className="text-center py-8 space-y-4">
+                    <div className="inline-flex p-4 rounded-full bg-indigo-50 text-indigo-600 mb-2">
+                      <Award className="w-12 h-12" />
                     </div>
-
-                    {showQuizFeedback && (
-                      <div className={`p-4 rounded-2xl border ${
-                        userAnswer.trim().toLowerCase() === QUIZ_QUESTIONS[quizIndex].answer
-                          ? "bg-emerald-50 border-emerald-100 text-emerald-800"
-                          : "bg-rose-50 border-rose-100 text-rose-800"
-                      } space-y-2 text-xs sm:text-sm text-left`}>
-                        <p className="font-bold">
-                          {userAnswer.trim().toLowerCase() === QUIZ_QUESTIONS[quizIndex].answer
-                            ? "✓ ¡Correcto!"
-                            : `✗ Incorrecto. Se escribe: "${QUIZ_QUESTIONS[quizIndex].answer}"`}
-                        </p>
-                        <p className="opacity-90 font-sans text-xs sm:text-xs leading-relaxed">
-                          <strong>Explicación:</strong> {QUIZ_QUESTIONS[quizIndex].tip}
-                        </p>
-                      </div>
-                    )}
-
-                    <div className="flex gap-3">
-                      {!showQuizFeedback ? (
-                        <button
-                          type="submit"
-                          className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 cursor-pointer shadow-xs font-sans"
-                        >
-                          Verificar Respuesta
-                        </button>
+                    <h4 className="font-sans font-black text-gray-900 text-2xl">¡Quiz Completado!</h4>
+                    <p className="text-gray-600 text-sm max-w-md mx-auto font-sans">
+                      Has obtenido una puntuación de <strong className="text-indigo-600">{quizScore} / {activeQuestions.length}</strong> aciertos.
+                    </p>
+                    
+                    <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100 max-w-md mx-auto text-xs text-gray-500 font-sans">
+                      {quizScore === activeQuestions.length ? (
+                        <p className="text-indigo-700 font-bold">🎉 ¡Excelente! Eres un maestro absoluto de la ortografía de números según las normas de la Real Academia Española (RAE).</p>
+                      ) : quizScore >= 7 ? (
+                        <p className="text-emerald-700 font-bold">👍 ¡Muy bien hecho! Tienes un gran dominio ortográfico. Solo te faltaron algunos detalles menores.</p>
                       ) : (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setShowQuizFeedback(false);
-                            setUserAnswer("");
-                            if (quizIndex + 1 < QUIZ_QUESTIONS.length) {
-                              setQuizIndex((prev) => prev + 1);
-                            } else {
-                              setQuizFinished(true);
-                            }
-                          }}
-                          className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 cursor-pointer shadow-xs font-sans"
-                        >
-                          <span>{quizIndex + 1 < QUIZ_QUESTIONS.length ? "Siguiente Pregunta" : "Ver Resultados"}</span>
-                          <ArrowRight className="w-4 h-4" />
-                        </button>
+                        <p className="text-blue-700 font-bold">💡 ¡Buen intento! Te recomendamos repasar nuestra sección de "Reglas de Oro" y volver a intentarlo para perfeccionar tu dominio.</p>
                       )}
                     </div>
-                  </form>
-                </div>
-              )}
-            </div>
-          )}
+
+                    <button
+                      onClick={() => {
+                        setQuizIndex(0);
+                        setQuizScore(0);
+                        setUserAnswer("");
+                        setShowQuizFeedback(false);
+                        setQuizFinished(false);
+                        setCurrentQuestions(generateDynamicQuestions());
+                      }}
+                      className="mt-4 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-sans font-bold text-xs sm:text-sm rounded-xl shadow-md shadow-blue-500/10 cursor-pointer transition-all"
+                    >
+                      Reiniciar Cuestionario
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    <div className="bg-slate-50 border border-slate-100 p-6 rounded-2xl text-center">
+                      <p className="text-xs font-mono font-bold text-gray-400 uppercase tracking-widest mb-1">Escribe con letras el siguiente número:</p>
+                      <h5 className="font-mono font-black text-gray-900 text-4xl py-3">
+                        {activeQuestions[quizIndex]?.num}
+                      </h5>
+                      <p className="text-xs text-gray-500 italic font-sans">Escribe tu respuesta en minúsculas y sin espacios innecesarios.</p>
+                    </div>
+
+                    <form 
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        if (showQuizFeedback) return;
+                        const cleanedAnswer = userAnswer.trim().toLowerCase();
+                        const isCorrect = cleanedAnswer === activeQuestions[quizIndex]?.answer;
+                        if (isCorrect) {
+                          setQuizScore((prev) => prev + 1);
+                        }
+                        setShowQuizFeedback(true);
+                      }}
+                      className="space-y-4"
+                    >
+                      <div className="text-left">
+                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 font-sans">Tu Respuesta:</label>
+                        <input
+                          type="text"
+                          disabled={showQuizFeedback}
+                          value={userAnswer}
+                          onChange={(e) => setUserAnswer(e.target.value)}
+                          placeholder="Ej: veintitrés"
+                          className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-sans focus:outline-hidden focus:border-blue-500 transition disabled:opacity-75 font-semibold text-gray-900"
+                          required
+                          autoFocus
+                        />
+                      </div>
+
+                      {showQuizFeedback && (
+                        <div className={`p-4 rounded-2xl border ${
+                          userAnswer.trim().toLowerCase() === activeQuestions[quizIndex]?.answer
+                            ? "bg-emerald-50 border-emerald-100 text-emerald-800"
+                            : "bg-rose-50 border-rose-100 text-rose-800"
+                        } space-y-2 text-xs sm:text-sm text-left`}>
+                          <p className="font-bold">
+                            {userAnswer.trim().toLowerCase() === activeQuestions[quizIndex]?.answer
+                              ? "✓ ¡Correcto!"
+                              : `✗ Incorrecto. Se escribe: "${activeQuestions[quizIndex]?.answer}"`}
+                          </p>
+                          <p className="opacity-90 font-sans text-xs sm:text-xs leading-relaxed">
+                            <strong>Explicación:</strong> {activeQuestions[quizIndex]?.tip}
+                          </p>
+                        </div>
+                      )}
+
+                      <div className="flex gap-3">
+                        {!showQuizFeedback ? (
+                          <button
+                            type="submit"
+                            className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 cursor-pointer shadow-xs font-sans"
+                          >
+                            Verificar Respuesta
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setShowQuizFeedback(false);
+                              setUserAnswer("");
+                              if (quizIndex + 1 < activeQuestions.length) {
+                                setQuizIndex((prev) => prev + 1);
+                              } else {
+                                setQuizFinished(true);
+                              }
+                            }}
+                            className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 cursor-pointer shadow-xs font-sans"
+                          >
+                            <span>{quizIndex + 1 < activeQuestions.length ? "Siguiente Pregunta" : "Ver Resultados"}</span>
+                            <ArrowRight className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
+                    </form>
+                  </div>
+                )}
+              </div>
+            );
+          })()}
         </div>
       </div>
 
@@ -872,44 +1165,78 @@ export default function HowToEscribe({
             {/* Structured Details list */}
             <div className="space-y-4">
               {/* Masculine words */}
-              <div className="bg-gray-50 rounded-2xl p-4 border border-gray-100">
-                <span className="block text-[10px] font-mono font-bold text-gray-400 uppercase tracking-widest mb-1.5">
-                  Escritura Masculina (Estándar)
-                </span>
-                <p className="font-sans font-bold text-gray-800 text-sm sm:text-base">
-                  {selectedSeoNum.text}
-                </p>
-                <span className="text-[10px] text-gray-400 font-sans block mt-1">
-                  Ej: {selectedSeoNum.text.toLowerCase()} {selectedSeoNum.num === 100 ? "libros" : "libros"}
-                </span>
+              <div className="bg-gray-50 rounded-2xl p-4 border border-gray-100 flex items-center justify-between gap-4">
+                <div className="space-y-1">
+                  <span className="block text-[10px] font-mono font-bold text-gray-400 uppercase tracking-widest mb-1">
+                    Escritura Masculina (Estándar)
+                  </span>
+                  <p className="font-sans font-bold text-gray-800 text-sm sm:text-base">
+                    {selectedSeoNum.text}
+                  </p>
+                  <span className="text-[10px] text-gray-400 font-sans block mt-1">
+                    Ej: {selectedSeoNum.text.toLowerCase()} libros
+                  </span>
+                </div>
+                <button
+                  onClick={() => triggerCopy("seo_masc", selectedSeoNum.text)}
+                  className="p-2 bg-white hover:bg-blue-50 rounded-lg text-gray-400 hover:text-blue-600 border border-gray-200/60 transition-all cursor-pointer flex-shrink-0"
+                  title="Copiar"
+                >
+                  {copiedId === "seo_masc" ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                </button>
               </div>
 
               {/* Feminine words */}
-              <div className="bg-gray-50 rounded-2xl p-4 border border-gray-100">
-                <span className="block text-[10px] font-mono font-bold text-gray-400 uppercase tracking-widest mb-1.5">
-                  Escritura Femenina
-                </span>
-                <p className="font-sans font-semibold text-gray-700 text-sm">
-                  {convertNumberToLetters(selectedSeoNum.num, { gender: 'F' })}
-                </p>
-                <span className="text-[10px] text-gray-400 font-sans block mt-1">
-                  Ej: {convertNumberToLetters(selectedSeoNum.num, { gender: 'F' }).toLowerCase()} {selectedSeoNum.num === 100 ? "personas" : "personas"}
-                </span>
+              <div className="bg-gray-50 rounded-2xl p-4 border border-gray-100 flex items-center justify-between gap-4">
+                <div className="space-y-1">
+                  <span className="block text-[10px] font-mono font-bold text-gray-400 uppercase tracking-widest mb-1">
+                    Escritura Femenina
+                  </span>
+                  <p className="font-sans font-semibold text-gray-700 text-sm">
+                    {convertNumberToLetters(selectedSeoNum.num, { gender: 'F' })}
+                  </p>
+                  <span className="text-[10px] text-gray-400 font-sans block mt-1">
+                    Ej: {convertNumberToLetters(selectedSeoNum.num, { gender: 'F' }).toLowerCase()} personas
+                  </span>
+                </div>
+                <button
+                  onClick={() => triggerCopy("seo_fem", convertNumberToLetters(selectedSeoNum.num, { gender: 'F' }))}
+                  className="p-2 bg-white hover:bg-blue-50 rounded-lg text-gray-400 hover:text-blue-600 border border-gray-200/60 transition-all cursor-pointer flex-shrink-0"
+                  title="Copiar"
+                >
+                  {copiedId === "seo_fem" ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                </button>
               </div>
 
-              {/* Financial words (Pesos) */}
-              <div className="bg-gray-50 rounded-2xl p-4 border border-gray-150">
-                <span className="block text-[10px] font-mono font-bold text-gray-400 uppercase tracking-widest mb-1.5">
-                  Formato Factura / Moneda (Pesos)
-                </span>
-                <p className="font-sans font-semibold text-gray-700 text-xs sm:text-sm italic">
-                  {convertNumberToLetters(selectedSeoNum.num, {
+              {/* Financial words */}
+              <div className="bg-gray-50 rounded-2xl p-4 border border-gray-150 flex items-center justify-between gap-4">
+                <div className="space-y-1">
+                  <span className="block text-[10px] font-mono font-bold text-gray-400 uppercase tracking-widest mb-1">
+                    Formato Factura / Moneda ({currentCurrencyName})
+                  </span>
+                  <p className="font-sans font-semibold text-gray-700 text-xs sm:text-sm italic">
+                    {convertNumberToLetters(selectedSeoNum.num, {
+                      gender: 'N',
+                      isCurrency: true,
+                      currencyName: currentCurrencyName,
+                      currencyCentName: currentCurrencyCentName,
+                      formatFinancial: true
+                    })}
+                  </p>
+                </div>
+                <button
+                  onClick={() => triggerCopy("seo_fin", convertNumberToLetters(selectedSeoNum.num, {
                     gender: 'N',
                     isCurrency: true,
-                    currencyName: "pesos",
+                    currencyName: currentCurrencyName,
+                    currencyCentName: currentCurrencyCentName,
                     formatFinancial: true
-                  })}
-                </p>
+                  }))}
+                  className="p-2 bg-white hover:bg-blue-50 rounded-lg text-gray-400 hover:text-blue-600 border border-gray-200/60 transition-all cursor-pointer flex-shrink-0"
+                  title="Copiar"
+                >
+                  {copiedId === "seo_fin" ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                </button>
               </div>
             </div>
 
@@ -933,6 +1260,21 @@ export default function HowToEscribe({
           </div>
         </div>
       )}
+
+      {/* Toast Alert Notification */}
+      <AnimatePresence>
+        {toastVisible && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 30, scale: 0.95 }}
+            className="fixed bottom-6 right-6 z-[9999] bg-slate-900 text-white text-xs font-bold px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-2.5 border border-slate-800"
+          >
+            <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span>{toastMessage}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

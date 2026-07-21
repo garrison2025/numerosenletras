@@ -76,3 +76,46 @@ body {
   -moz-osx-font-smoothing: grayscale;
   scroll-behavior: smooth;
 }
+
+/* Print Media Styles - For printing the interactive cheque cleanly */
+@media print {
+  /* Hide all elements by default */
+  body * {
+    visibility: hidden;
+  }
+  
+  /* Show only the printable cheque container and its children */
+  .printable-cheque, .printable-cheque * {
+    visibility: visible;
+  }
+  
+  /* Position and style the cheque beautifully for full-page standard printing */
+  .printable-cheque {
+    position: absolute;
+    left: 0;
+    top: 40px;
+    width: 100% !important;
+    max-width: 100% !important;
+    border: 2px solid #059669 !important;
+    box-shadow: none !important;
+    background-color: #f8fafc !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    border-radius: 16px !important;
+    padding: 24px !important;
+  }
+  
+  /* Format input fields as flat lines during print */
+  .printable-cheque input {
+    border: none !important;
+    border-bottom: 1px dashed #cbd5e1 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+  
+  /* Hide action buttons inside the cheque container during print */
+  .print-action-btn {
+    display: none !important;
+  }
+}
