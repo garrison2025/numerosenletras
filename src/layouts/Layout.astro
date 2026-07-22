@@ -82,6 +82,10 @@ const breadcrumbs = getBreadcrumbs();
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
+    {currentPath.startsWith("/blog") && image && (
+      <link rel="preload" as="image" href={image} fetchpriority="high" type="image/webp" />
+    )}
+
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content={canonicalUrl} />

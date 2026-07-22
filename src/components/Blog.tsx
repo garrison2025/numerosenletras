@@ -681,8 +681,15 @@ function BlogWidget({ slug, onNavigate }: { slug: string; onNavigate: (path: str
   return null;
 }
 
-export default function Blog({ onNavigate, selectedSlug }: { onNavigate?: (path: string) => void; selectedSlug?: string }) {
+export default function Blog({ onNavigate, selectedSlug, optimizedImages }: { onNavigate?: (path: string) => void; selectedSlug?: string; optimizedImages?: Record<string, string> }) {
   const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
+
+  const getPostImage = (imagePath: string) => {
+    if (optimizedImages && optimizedImages[imagePath]) {
+      return optimizedImages[imagePath];
+    }
+    return imagePath;
+  };
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -914,13 +921,17 @@ export default function Blog({ onNavigate, selectedSlug }: { onNavigate?: (path:
               {/* Featured Image */}
               <div className="w-full aspect-video sm:aspect-[21/9] max-h-[480px] rounded-2xl overflow-hidden mb-8 shadow-xs border border-gray-100 bg-gray-100">
                 <img 
-                  src={selectedPost.image} 
+                  src={getPostImage(selectedPost.image)} 
                   alt={selectedPost.title} 
                   title={selectedPost.title}
                   loading="eager"
+                  fetchPriority="high"
+                  decoding="async"
                   width="1200"
                   height="514"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 1200px"
                   referrerPolicy="no-referrer"
+                  style={{ aspectRatio: "1200/514", width: "100%", height: "auto" }}
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -1075,13 +1086,16 @@ export default function Blog({ onNavigate, selectedSlug }: { onNavigate?: (path:
                     {/* Image Thumbnail Column */}
                     <div className="w-full md:w-1/3 relative aspect-video md:aspect-auto overflow-hidden bg-gray-100 border-b md:border-b-0 md:border-r border-gray-100">
                       <img 
-                        src={post.image} 
+                        src={getPostImage(post.image)} 
                         alt={post.title} 
                         title={post.title}
                         loading="lazy"
+                        decoding="async"
                         width="400"
                         height="225"
+                        sizes="(max-width: 768px) 100vw, 33vw"
                         referrerPolicy="no-referrer"
+                        style={{ aspectRatio: "400/225", width: "100%", height: "auto" }}
                         className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-500 cursor-pointer"
                         onClick={() => handlePostClick(post)}
                       />
