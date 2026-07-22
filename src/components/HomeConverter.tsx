@@ -226,6 +226,48 @@ export default function HomeConverter({ initialNumber, onNavigate }: { initialNu
     }
   }, []);
 
+  // Keyboard hotkeys listener for desktop power users
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const activeEl = document.activeElement;
+      const isTyping = activeEl && (activeEl.tagName === "INPUT" || activeEl.tagName === "TEXTAREA");
+
+      if (e.key === "Escape") {
+        if (inputVal) {
+          setInputVal("");
+          showToast("Campos limpiados");
+        }
+        return;
+      }
+
+      if ((e.key === "/" || (e.key === "k" && (e.ctrlKey || e.metaKey))) && !isTyping) {
+        e.preventDefault();
+        if (inputRef.current) {
+          inputRef.current.focus();
+          inputRef.current.select();
+        }
+        return;
+      }
+
+      if ((e.key === "c" || e.key === "C") && (e.ctrlKey || e.metaKey) && !isTyping) {
+        if (result && !result.startsWith("Entrada no")) {
+          navigator.clipboard.writeText(result);
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2000);
+          showToast("Resultado copiado al portapapeles (Ctrl+C)");
+        }
+      }
+
+      if (e.altKey && (e.key === "r" || e.key === "R")) {
+        e.preventDefault();
+        handleRandomNumber();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [inputVal, result]);
+
   // Sync initialNumber when it changes or read from URL query parameters on mount
   useEffect(() => {
     if (initialNumber) {
