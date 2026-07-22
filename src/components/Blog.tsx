@@ -23,6 +23,112 @@ import {
 import { convertNumberToLetters } from "../utils/numberToLetters";
 import { AESTHETIC_FONTS } from "../utils/fontGenerators";
 
+const createNumerosLetrasSVG = () => {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+    <defs>
+      <linearGradient id="bg1" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#0f172a"/>
+        <stop offset="50%" stop-color="#1e1b4b"/>
+        <stop offset="100%" stop-color="#1e293b"/>
+      </linearGradient>
+      <linearGradient id="cardGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#ffffff" stop-opacity="0.12"/>
+        <stop offset="100%" stop-color="#ffffff" stop-opacity="0.03"/>
+      </linearGradient>
+      <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#3b82f6"/>
+        <stop offset="50%" stop-color="#8b5cf6"/>
+        <stop offset="100%" stop-color="#ec4899"/>
+      </linearGradient>
+    </defs>
+    <rect width="1200" height="630" fill="url(#bg1)"/>
+    <circle cx="200" cy="150" r="250" fill="#3b82f6" opacity="0.15"/>
+    <circle cx="1000" cy="500" r="300" fill="#8b5cf6" opacity="0.15"/>
+    <rect x="100" y="80" width="1000" height="470" rx="32" fill="url(#cardGrad)" stroke="#ffffff" stroke-opacity="0.18" stroke-width="2"/>
+    <rect x="150" y="130" width="220" height="42" rx="21" fill="#3b82f6" fill-opacity="0.2" stroke="#60a5fa" stroke-width="1.5"/>
+    <text x="260" y="157" font-family="system-ui, sans-serif" font-weight="800" font-size="14" fill="#93c5fd" text-anchor="middle" letter-spacing="2">NORMATIVA RAE 2026</text>
+    <text x="150" y="230" font-family="system-ui, sans-serif" font-weight="900" font-size="46" fill="#ffffff">Convertidor de Números a Letras</text>
+    <text x="150" y="280" font-family="system-ui, sans-serif" font-weight="600" font-size="22" fill="#94a3b8">Guía completa para cheques, contratos y documentos legales</text>
+    <rect x="150" y="320" width="900" height="170" rx="20" fill="#090d16" fill-opacity="0.8" stroke="#334155" stroke-width="1.5"/>
+    <text x="190" y="370" font-family="monospace" font-weight="700" font-size="28" fill="#38bdf8">1.250.450,75 €</text>
+    <text x="450" y="370" font-family="system-ui, sans-serif" font-weight="800" font-size="20" fill="#4ade80">"Un millón doscientos..."</text>
+    <text x="190" y="440" font-family="system-ui, sans-serif" font-weight="600" font-size="18" fill="#cbd5e1">Son: Un millón doscientos cincuenta mil cuatrocientos cincuenta euros con 75/100</text>
+    <rect x="150" y="515" width="900" height="6" rx="3" fill="url(#accentGrad)"/>
+  </svg>`;
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+};
+
+const createLetrasBurbujaSVG = () => {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+    <defs>
+      <linearGradient id="bg2" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#31104b"/>
+        <stop offset="50%" stop-color="#6b21a8"/>
+        <stop offset="100%" stop-color="#581c87"/>
+      </linearGradient>
+      <linearGradient id="bubbleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#f472b6"/>
+        <stop offset="100%" stop-color="#c084fc"/>
+      </linearGradient>
+    </defs>
+    <rect width="1200" height="630" fill="url(#bg2)"/>
+    <circle cx="150" cy="120" r="80" fill="#ec4899" opacity="0.25"/>
+    <circle cx="1050" cy="180" r="110" fill="#a855f7" opacity="0.25"/>
+    <circle cx="900" cy="520" r="90" fill="#f43f5e" opacity="0.2"/>
+    <rect x="100" y="80" width="1000" height="470" rx="32" fill="#ffffff" fill-opacity="0.08" stroke="#ffffff" stroke-opacity="0.2" stroke-width="2"/>
+    <rect x="150" y="130" width="240" height="42" rx="21" fill="#f472b6" fill-opacity="0.25" stroke="#f472b6" stroke-width="1.5"/>
+    <text x="270" y="157" font-family="system-ui, sans-serif" font-weight="800" font-size="14" fill="#fbcfe8" text-anchor="middle" letter-spacing="2">TIPOGRAFÍAS REDONDAS</text>
+    <text x="150" y="230" font-family="system-ui, sans-serif" font-weight="900" font-size="48" fill="#ffffff">Letras Burbuja y Redondas</text>
+    <text x="150" y="280" font-family="system-ui, sans-serif" font-weight="600" font-size="22" fill="#e9d5ff">Copiar y pegar símbolos Unicode para Instagram, TikTok y WhatsApp</text>
+    <rect x="150" y="325" width="900" height="160" rx="20" fill="#1e112a" fill-opacity="0.85" stroke="#a855f7" stroke-width="1.5"/>
+    <text x="190" y="380" font-family="sans-serif" font-weight="bold" font-size="34" fill="#f472b6">ⓁⒺⓉⓇⒶⓈ  ⒷⓊⓇⒷ⒊ⒿⒶ</text>
+    <text x="190" y="440" font-family="sans-serif" font-weight="bold" font-size="32" fill="#38bdf8">🅟🅞🅟🅤🅛🅐🅡  ⓈⓉⓎⓁⓄⓈ</text>
+    <rect x="150" y="515" width="900" height="6" rx="3" fill="url(#bubbleGrad)"/>
+  </svg>`;
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+};
+
+const createLetrasAestheticSVG = () => {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+    <defs>
+      <linearGradient id="bg3" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#180e29"/>
+        <stop offset="50%" stop-color="#2e1065"/>
+        <stop offset="100%" stop-color="#030712"/>
+      </linearGradient>
+      <linearGradient id="aestGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#a855f7"/>
+        <stop offset="50%" stop-color="#ec4899"/>
+        <stop offset="100%" stop-color="#f43f5e"/>
+      </linearGradient>
+    </defs>
+    <rect width="1200" height="630" fill="url(#bg3)"/>
+    <text x="160" y="120" font-size="28" fill="#f472b6">✦</text>
+    <text x="1020" y="140" font-size="36" fill="#c084fc">✧</text>
+    <text x="920" y="510" font-size="32" fill="#f472b6">✦</text>
+    <rect x="100" y="80" width="1000" height="470" rx="32" fill="#ffffff" fill-opacity="0.06" stroke="#ffffff" stroke-opacity="0.18" stroke-width="2"/>
+    <rect x="150" y="130" width="250" height="42" rx="21" fill="#a855f7" fill-opacity="0.3" stroke="#c084fc" stroke-width="1.5"/>
+    <text x="275" y="157" font-family="system-ui, sans-serif" font-weight="800" font-size="14" fill="#e9d5ff" text-anchor="middle" letter-spacing="2">GENERADOR DE FUENTES</text>
+    <text x="150" y="230" font-family="system-ui, sans-serif" font-weight="900" font-size="48" fill="#ffffff">Letras Aesthetic &amp; Bonitas</text>
+    <text x="150" y="280" font-family="system-ui, sans-serif" font-weight="600" font-size="22" fill="#d8b4fe">Crea textos con estilo para bios, nicks y estados</text>
+    <rect x="150" y="325" width="900" height="160" rx="20" fill="#0f071a" fill-opacity="0.9" stroke="#e879f9" stroke-width="1.5"/>
+    <text x="190" y="375" font-family="serif" font-weight="bold" font-size="32" fill="#f472b6">𝓐𝓮𝓼𝓽𝓱𝓮𝓽𝓲𝓬  𝓢𝓽𝔂𝓵𝓮𝓼  ✦  ☁️</text>
+    <text x="190" y="440" font-family="monospace" font-weight="bold" font-size="28" fill="#38bdf8">𝕒𝕖𝕤𝕥𝕙𝕖𝕥𝕚𝕔 • ⓈⓉⓎⓁⒺ • [̲̅F][̲̅O][̲̅N][̲̅T][̲̅S]</text>
+    <rect x="150" y="515" width="900" height="6" rx="3" fill="url(#aestGrad)"/>
+  </svg>`;
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+};
+
+export const SVG_FALLBACKS: Record<string, string> = {
+  "como-convertir-numeros-a-letras": createNumerosLetrasSVG(),
+  "letras-burbuja-redondas": createLetrasBurbujaSVG(),
+  "letras-aesthetic-guia-completa": createLetrasAestheticSVG(),
+};
+
+const imgNumerosLetras = "/assets/images/blog_numeros_letras.jpg";
+const imgLetrasBurbuja = "/assets/images/blog_letras_burbuja.jpg";
+const imgLetrasAesthetic = "/assets/images/blog_letras_aesthetic.jpg";
+
 export interface BlogPost {
   id: string;
   slug: string;
@@ -48,7 +154,7 @@ export const BLOG_POSTS: BlogPost[] = [
     readTime: "12 min de lectura",
     category: "Finanzas",
     keywords: ["numeros en letras", "cantidad con letra", "numeros a letras", "convertir numeros a letras", "cómo se escribe con letra", "convertidor de numeros a letras"],
-    image: "/assets/images/blog_numeros_letras.webp",
+    image: SVG_FALLBACKS["como-convertir-numeros-a-letras"] || imgNumerosLetras,
     content: `
       <div class="space-y-8 font-sans text-gray-800 leading-relaxed text-base">
         <!-- Introduction -->
@@ -201,7 +307,7 @@ export const BLOG_POSTS: BlogPost[] = [
     readTime: "10 min de lectura",
     category: "Diseño",
     keywords: ["letras burbuja", "letras aesthetic copiar y pegar", "letras pequeñas"],
-    image: "/assets/images/blog_letras_burbuja.webp",
+    image: SVG_FALLBACKS["letras-burbuja-redondas"] || imgLetrasBurbuja,
     content: `
       <div class="space-y-8 font-sans text-gray-800 leading-relaxed text-base">
         <!-- Introduction -->
@@ -297,7 +403,7 @@ export const BLOG_POSTS: BlogPost[] = [
     readTime: "11 min de lectura",
     category: "Diseño",
     keywords: ["letras pequeñas", "letras aesthetic copiar y pegar", "convertidor de numeros a letras"],
-    image: "/assets/images/blog_letras_aesthetic.webp",
+    image: SVG_FALLBACKS["letras-aesthetic-guia-completa"] || imgLetrasAesthetic,
     content: `
       <div class="space-y-8 font-sans text-gray-800 leading-relaxed text-base">
         <!-- Introduction -->
@@ -684,11 +790,16 @@ function BlogWidget({ slug, onNavigate }: { slug: string; onNavigate: (path: str
 export default function Blog({ onNavigate, selectedSlug, optimizedImages }: { onNavigate?: (path: string) => void; selectedSlug?: string; optimizedImages?: Record<string, string> }) {
   const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
 
-  const getPostImage = (imagePath: string) => {
-    if (optimizedImages && optimizedImages[imagePath]) {
-      return optimizedImages[imagePath];
+  const getPostImage = (imagePath: string | any) => {
+    if (!imagePath) return "/assets/images/blog_numeros_letras.webp";
+    if (typeof imagePath === "object" && imagePath.src) return imagePath.src;
+    if (typeof imagePath === "string") {
+      if (optimizedImages && optimizedImages[imagePath]) {
+        return optimizedImages[imagePath];
+      }
+      return imagePath;
     }
-    return imagePath;
+    return String(imagePath);
   };
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
@@ -931,6 +1042,12 @@ export default function Blog({ onNavigate, selectedSlug, optimizedImages }: { on
                   height="514"
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 1200px"
                   referrerPolicy="no-referrer"
+                  onError={(e) => {
+                    const fallback = SVG_FALLBACKS[selectedPost.slug] || SVG_FALLBACKS["como-convertir-numeros-a-letras"];
+                    if (e.currentTarget.src !== fallback) {
+                      e.currentTarget.src = fallback;
+                    }
+                  }}
                   style={{ aspectRatio: "1200/514", width: "100%", height: "auto" }}
                   className="w-full h-full object-cover"
                 />
@@ -1095,6 +1212,12 @@ export default function Blog({ onNavigate, selectedSlug, optimizedImages }: { on
                         height="225"
                         sizes="(max-width: 768px) 100vw, 33vw"
                         referrerPolicy="no-referrer"
+                        onError={(e) => {
+                          const fallback = SVG_FALLBACKS[post.slug] || SVG_FALLBACKS["como-convertir-numeros-a-letras"];
+                          if (e.currentTarget.src !== fallback) {
+                            e.currentTarget.src = fallback;
+                          }
+                        }}
                         style={{ aspectRatio: "400/225", width: "100%", height: "auto" }}
                         className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-500 cursor-pointer"
                         onClick={() => handlePostClick(post)}
