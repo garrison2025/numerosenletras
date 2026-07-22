@@ -497,7 +497,7 @@ export default function QuantityWithLetter({ initialAmount }: { initialAmount?: 
           <Receipt className="w-3.5 h-3.5 text-emerald-500" />
           <span className="font-display tracking-wide uppercase text-[10px]">Formato Oficial de Cantidad con Letra</span>
         </div>
-        <h1 className="font-display font-extrabold text-3xl sm:text-4xl md:text-5xl tracking-tight text-gray-900 mb-4 bg-gradient-to-r from-gray-900 via-emerald-950 to-teal-950 bg-clip-text">
+        <h1 className="font-display font-extrabold text-3xl sm:text-4xl md:text-5xl tracking-tight text-gray-900 mb-4">
           Conversor de Cantidad con Letra
         </h1>
         <p className="font-sans text-gray-600 max-w-2xl mx-auto leading-relaxed text-sm sm:text-base">

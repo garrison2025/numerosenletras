@@ -388,7 +388,7 @@ export default function BubbleLetters({ initialText }: { initialText?: string })
           <CircleDot className="w-3.5 h-3.5 text-blue-500" />
           <span className="font-display tracking-wide uppercase text-[10px]">Generador de letras burbuja copiar y pegar y letras en círculos</span>
         </div>
-        <h1 className="font-display font-extrabold text-3xl sm:text-4xl md:text-5xl tracking-tight text-gray-900 mb-4 bg-gradient-to-r from-gray-900 via-blue-950 to-indigo-950 bg-clip-text">
+        <h1 className="font-display font-extrabold text-3xl sm:text-4xl md:text-5xl tracking-tight text-gray-900 mb-4">
           Generador de Letras Burbuja
         </h1>
         <p className="font-sans text-gray-600 max-w-2xl mx-auto leading-relaxed text-sm sm:text-base">
