@@ -705,7 +705,8 @@ export default function App() {
   // Render active page
   const renderPage = () => {
     if (currentPath.startsWith("/blog")) {
-      return <Blog onNavigate={navigateTo} />;
+      const slug = currentPath.length > 6 && currentPath.startsWith("/blog/") ? currentPath.substring(6) : undefined;
+      return <Blog onNavigate={navigateTo} selectedSlug={slug} />;
     }
 
     switch (currentPath) {

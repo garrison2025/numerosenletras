@@ -810,14 +810,29 @@ export default function Blog({ onNavigate, selectedSlug, optimizedImages }: { on
   const [scrollProgress, setScrollProgress] = useState(0);
   const [showScrollTop, setShowScrollTop] = useState(false);
 
-  // Set initial post if selectedSlug is passed
+  // Set initial post if selectedSlug is passed, or sync with URL
   useEffect(() => {
-    if (selectedSlug) {
-      const post = BLOG_POSTS.find(p => p.slug === selectedSlug);
+    let slugToUse = selectedSlug;
+    if (!slugToUse) {
+      const hash = window.location.hash;
+      const pathname = window.location.pathname;
+      if (hash.startsWith("#/blog/")) {
+        slugToUse = hash.substring(7);
+      } else if (pathname.startsWith("/blog/")) {
+        slugToUse = pathname.substring(6);
+      }
+    }
+
+    if (slugToUse) {
+      const post = BLOG_POSTS.find(p => p.slug === slugToUse);
       if (post) {
         setSelectedPost(post);
+        return;
       }
-    } else {
+    }
+
+    // Only reset if explicitly navigated to list
+    if (selectedSlug === "" || (!selectedSlug && (window.location.hash === "#/blog" || window.location.pathname === "/blog"))) {
       setSelectedPost(null);
     }
   }, [selectedSlug]);
@@ -883,45 +898,66 @@ export default function Blog({ onNavigate, selectedSlug, optimizedImages }: { on
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [selectedPost]);
 
-  // Sync route with slug if needed, but only if onNavigate is present (SPA mode fallback)
+  // Sync route with slug when location changes
   useEffect(() => {
-    if (!onNavigate) return;
-    const handleHashChange = () => {
+    const handleLocationChange = () => {
       const hash = window.location.hash;
+      const pathname = window.location.pathname;
+      let slug: string | null = null;
+
       if (hash.startsWith("#/blog/")) {
-        const slug = hash.substring(7);
+        slug = hash.substring(7);
+      } else if (pathname.startsWith("/blog/")) {
+        slug = pathname.substring(6);
+      }
+
+      if (slug) {
         const post = BLOG_POSTS.find(p => p.slug === slug);
         if (post) {
           setSelectedPost(post);
-        } else {
+          return;
+        }
+      }
+
+      if (hash === "#/blog" || hash === "" || pathname === "/blog") {
+        if (!selectedSlug) {
           setSelectedPost(null);
         }
-      } else if (hash === "#/blog") {
-        setSelectedPost(null);
       }
     };
 
-    handleHashChange();
-    window.addEventListener("hashchange", handleHashChange);
-    return () => window.removeEventListener("hashchange", handleHashChange);
-  }, [onNavigate]);
+    window.addEventListener("hashchange", handleLocationChange);
+    window.addEventListener("popstate", handleLocationChange);
+    return () => {
+      window.removeEventListener("hashchange", handleLocationChange);
+      window.removeEventListener("popstate", handleLocationChange);
+    };
+  }, [selectedSlug]);
 
   const handlePostClick = (post: BlogPost) => {
-    if (onNavigate) {
-      window.location.hash = `#/blog/${post.slug}`;
-    } else {
-      window.location.href = `/blog/${post.slug}`;
-    }
     setSelectedPost(post);
+    if (onNavigate) {
+      onNavigate(`/blog/${post.slug}`);
+    } else {
+      try {
+        window.history.pushState(null, "", `/blog/${post.slug}`);
+      } catch (e) {
+        window.location.hash = `#/blog/${post.slug}`;
+      }
+    }
   };
 
   const handleBackToList = () => {
-    if (onNavigate) {
-      window.location.hash = `#/blog`;
-    } else {
-      window.location.href = `/blog`;
-    }
     setSelectedPost(null);
+    if (onNavigate) {
+      onNavigate(`/blog`);
+    } else {
+      try {
+        window.history.pushState(null, "", `/blog`);
+      } catch (e) {
+        window.location.hash = `#/blog`;
+      }
+    }
   };
 
   const filteredPosts = BLOG_POSTS.filter(post => {
