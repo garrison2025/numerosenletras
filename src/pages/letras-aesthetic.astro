@@ -6,19 +6,47 @@ const title = "Letras Aesthetic | Conversor de Fuentes Lindas y Bonitas online";
 const description = "Transforma tus textos normales en letras aesthetic, fuentes cursivas, negritas y símbolos mágicos para copiar y pegar en tu biografía de Instagram, TikTok y más.";
 const keywords = "letras aesthetic, tipografias bonitas, fuentes lindas, fuentes cursivas para copiar, letras para instagram, copiar y pegar fuentes";
 
-const schemaData = {
-  "@context": "https://schema.org",
-  "@type": "WebApplication",
-  "name": "Letras Aesthetic - Conversor de Fuentes Bonitas",
-  "url": "https://numerosenletras.org/letras-aesthetic",
-  "description": description,
-  "applicationCategory": "EducationalApplication",
-  "operatingSystem": "All",
-  "browserRequirements": "Requires JavaScript. Requires HTML5."
-};
+const schemaData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Letras Aesthetic - Conversor de Fuentes Bonitas",
+    "url": "https://numerosenletras.org/letras-aesthetic",
+    "description": description,
+    "applicationCategory": "EducationalApplication",
+    "operatingSystem": "All",
+    "browserRequirements": "Requires JavaScript. Requires HTML5."
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "¿Cómo cambiar el tipo de letra para la biografía de Instagram o TikTok?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Escribe tu texto en el generador aesthetic, explora los más de 30 estilos disponibles (cursivas, cursiva gótica, espacio ancho, letras pequeñas) y presiona 'Copiar' para pegarlo en tu perfil de Instagram, TikTok o Discord."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "¿Por qué se ven diferentes las letras aesthetic?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No son fuentes instalables en el sistema, sino mapas de símbolos y caracteres especiales Unicode que se pueden copiar y pegar en cualquier campo de texto plano."
+        }
+      }
+    ]
+  }
+];
+const breadcrumbs = [
+  { name: "Inicio", path: "/" },
+  { name: "Letras Aesthetic", path: "/letras-aesthetic" }
+];
 ---
 
-<Layout title={title} description={description} keywords={keywords} currentPath="/letras-aesthetic" schemaData={schemaData}>
+<Layout title={title} description={description} keywords={keywords} currentPath="/letras-aesthetic" schemaData={schemaData} breadcrumbs={breadcrumbs}>
   <div class="max-w-4xl mx-auto px-4 mt-6 sm:mt-10">
     <AestheticLetters client:load />
   </div>

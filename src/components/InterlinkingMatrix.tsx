@@ -154,6 +154,73 @@ export default function InterlinkingMatrix({ currentPath }: InterlinkingMatrixPr
           </div>
         </div>
       </div>
+
+      {/* Popular Search Keywords & Direct Lookup Matrix */}
+      <div className="pt-6 border-t border-gray-100 space-y-4">
+        <div className="space-y-2">
+          <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest pl-1 font-mono">
+            Consultas de Números Frecuentes en Letras (SEO Matrix)
+          </h4>
+          <div className="flex flex-wrap gap-1.5 text-[11px] font-sans">
+            <a href="/?n=100" className="px-2.5 py-1 rounded-md bg-blue-50/60 hover:bg-blue-100 text-blue-800 font-medium transition-colors">
+              100 en letras (Cien)
+            </a>
+            <a href="/?n=500" className="px-2.5 py-1 rounded-md bg-blue-50/60 hover:bg-blue-100 text-blue-800 font-medium transition-colors">
+              500 en letras (Quinientos)
+            </a>
+            <a href="/?n=1000" className="px-2.5 py-1 rounded-md bg-blue-50/60 hover:bg-blue-100 text-blue-800 font-medium transition-colors">
+              1000 en letras (Mil)
+            </a>
+            <a href="/?n=1500" className="px-2.5 py-1 rounded-md bg-blue-50/60 hover:bg-blue-100 text-blue-800 font-medium transition-colors">
+              1500 con letra
+            </a>
+            <a href="/?n=2000" className="px-2.5 py-1 rounded-md bg-blue-50/60 hover:bg-blue-100 text-blue-800 font-medium transition-colors">
+              2000 en letras (Dos mil)
+            </a>
+            <a href="/?n=5000" className="px-2.5 py-1 rounded-md bg-blue-50/60 hover:bg-blue-100 text-blue-800 font-medium transition-colors">
+              5000 en letras (Cinco mil)
+            </a>
+            <a href="/?n=10000" className="px-2.5 py-1 rounded-md bg-blue-50/60 hover:bg-blue-100 text-blue-800 font-medium transition-colors">
+              10,000 en letras (Diez mil)
+            </a>
+            <a href="/?n=50000" className="px-2.5 py-1 rounded-md bg-blue-50/60 hover:bg-blue-100 text-blue-800 font-medium transition-colors">
+              50,000 con letra (Cincuenta mil)
+            </a>
+            <a href="/?n=100000" className="px-2.5 py-1 rounded-md bg-blue-50/60 hover:bg-blue-100 text-blue-800 font-medium transition-colors">
+              100,000 con letra (Cien mil)
+            </a>
+            <a href="/?n=1000000" className="px-2.5 py-1 rounded-md bg-blue-50/60 hover:bg-blue-100 text-blue-800 font-medium transition-colors">
+              1,000,000 con letra (Un millón)
+            </a>
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest pl-1 font-mono">
+            Búsquedas Frecuentes y Guías Populares
+          </h4>
+          <div className="flex flex-wrap gap-2 text-xs font-sans">
+            <a href="/cantidad-con-letra" className="px-3 py-1.5 rounded-lg bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-200 text-gray-700 hover:text-blue-600 transition-colors">
+              • ¿Cómo escribir montos para cheques?
+            </a>
+            <a href="/como-se-escribe" className="px-3 py-1.5 rounded-lg bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-200 text-gray-700 hover:text-blue-600 transition-colors">
+              • ¿Se escribe "Un mil" o "Mil"?
+            </a>
+            <a href="/como-se-escribe" className="px-3 py-1.5 rounded-lg bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-200 text-gray-700 hover:text-blue-600 transition-colors">
+              • Reglas del 21 al 29 en una sola palabra
+            </a>
+            <a href="/letras-burbuja" className="px-3 py-1.5 rounded-lg bg-gray-50 hover:bg-purple-50 border border-gray-200 hover:border-purple-200 text-gray-700 hover:text-purple-600 transition-colors">
+              • Fuentes de círculos negros (Ⓒⓘⓡⓒⓤ󠁬Ⓞⓢ)
+            </a>
+            <a href="/letras-aesthetic" className="px-3 py-1.5 rounded-lg bg-gray-50 hover:bg-purple-50 border border-gray-200 hover:border-purple-200 text-gray-700 hover:text-purple-600 transition-colors">
+              • Letras cursivas y bonitas para Instagram
+            </a>
+            <a href="/cantidad-con-letra" className="px-3 py-1.5 rounded-lg bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-200 text-gray-700 hover:text-blue-600 transition-colors">
+              • Convertir números decimales y centavos
+            </a>
+          </div>
+        </div>
+      </div>
     </section>
   );
 }

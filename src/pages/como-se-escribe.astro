@@ -44,9 +44,13 @@ const schemaData = {
     }
   ]
 };
+const breadcrumbs = [
+  { name: "Inicio", path: "/" },
+  { name: "Como se Escribe con Letra", path: "/como-se-escribe" }
+];
 ---
 
-<Layout title={title} description={description} keywords={keywords} currentPath="/como-se-escribe" schemaData={schemaData}>
+<Layout title={title} description={description} keywords={keywords} currentPath="/como-se-escribe" schemaData={schemaData} breadcrumbs={breadcrumbs}>
   <div class="max-w-4xl mx-auto px-4 mt-6 sm:mt-10">
     <HowToEscribe client:load />
   </div>

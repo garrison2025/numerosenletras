@@ -79,9 +79,16 @@ const breadcrumbs = getBreadcrumbs();
     <meta name="keywords" content={keywords} />
     <meta name="google-site-verification" content="3hh3-fehDiki7YzVEL4KeWuGQhPfBLq23k_8zbACxE4" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#2563eb" />
+    <meta name="application-name" content="NumerosEnLetras" />
     <link rel="canonical" href={canonicalUrl} />
+    <link rel="alternate" hreflang="es" href={canonicalUrl} />
+    <link rel="alternate" hreflang="x-default" href={canonicalUrl} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
 
     {currentPath.startsWith("/blog") && image && (
       <link rel="preload" as="image" href={image} fetchpriority="high" type="image/webp" />
@@ -90,6 +97,8 @@ const breadcrumbs = getBreadcrumbs();
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:site_name" content="numerosenletras.org" />
+    <meta property="og:locale" content="es_ES" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content={image} />
@@ -115,7 +124,12 @@ const breadcrumbs = getBreadcrumbs();
       "@context": "https://schema.org",
       "@type": "WebSite",
       "name": "numerosenletras.org",
-      "url": "https://numerosenletras.org/"
+      "url": "https://numerosenletras.org/",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://numerosenletras.org/?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
     })} />
 
     {breadcrumbs && breadcrumbs.length > 0 && (
@@ -132,7 +146,13 @@ const breadcrumbs = getBreadcrumbs();
     )}
 
     {schemaData && (
-      <script type="application/ld+json" set:html={JSON.stringify(schemaData)} />
+      Array.isArray(schemaData) ? (
+        schemaData.map((schema) => (
+          <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+        ))
+      ) : (
+        <script type="application/ld+json" set:html={JSON.stringify(schemaData)} />
+      )
     )}
 
     <!-- ========================================== -->
@@ -225,6 +245,19 @@ const breadcrumbs = getBreadcrumbs();
           <div class="flex flex-col space-y-2 text-xs font-sans">
             <a href="/privacidad" class="hover:text-blue-500 hover:underline cursor-pointer">• Política de Privacidad</a>
             <a href="/terminos" class="hover:text-blue-500 hover:underline cursor-pointer">• Términos de Servicio</a>
+          </div>
+        </div>
+
+        <div class="space-y-3">
+          <h4 class="font-sans font-bold text-xs uppercase tracking-wider text-gray-900">
+            Herramientas Gratis
+          </h4>
+          <div class="flex flex-col space-y-2 text-xs font-sans">
+            <a href="/" class="hover:text-blue-500 hover:underline cursor-pointer">• Conversor de Números</a>
+            <a href="/cantidad-con-letra" class="hover:text-blue-500 hover:underline cursor-pointer">• Cantidad con Letra</a>
+            <a href="/letras-burbuja" class="hover:text-blue-500 hover:underline cursor-pointer">• Letras Burbuja</a>
+            <a href="/letras-aesthetic" class="hover:text-blue-500 hover:underline cursor-pointer">• Letras Aesthetic</a>
+            <a href="/como-se-escribe" class="hover:text-blue-500 hover:underline cursor-pointer">• Reglas Ortográficas RAE</a>
           </div>
         </div>
       </div>

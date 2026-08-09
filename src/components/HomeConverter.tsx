@@ -101,10 +101,17 @@ export default function HomeConverter({ initialNumber, onNavigate }: { initialNu
   const isFirstMount = useRef(true);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Auto-focus the input on mount
+  // Auto-focus the input on mount & read URL search params (?n= or ?q=)
   useEffect(() => {
     if (inputRef.current) {
       inputRef.current.focus();
+    }
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const queryNum = params.get("n") || params.get("q");
+      if (queryNum) {
+        setInputVal(queryNum);
+      }
     }
   }, []);
 

@@ -21,9 +21,14 @@ const imageSrc = post.image && typeof post.image === 'object' && 'src' in post.i
 const schemaData = {
   "@context": "https://schema.org",
   "@type": "BlogPosting",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": `https://numerosenletras.org${currentPath}`
+  },
   "headline": post.title,
   "description": post.excerpt,
   "datePublished": "2026-07-17T00:00:00+00:00",
+  "dateModified": "2026-08-08T00:00:00+00:00",
   "author": {
     "@type": "Organization",
     "name": post.author
@@ -38,6 +43,11 @@ const schemaData = {
   },
   "image": imageSrc ? (imageSrc.startsWith("http") ? imageSrc : `https://numerosenletras.org${imageSrc}`) : undefined
 };
+const breadcrumbs = [
+  { name: "Inicio", path: "/" },
+  { name: "Blog", path: "/blog" },
+  { name: post.title, path: currentPath }
+];
 ---
 
 <Layout 
@@ -47,6 +57,7 @@ const schemaData = {
   currentPath={currentPath}
   schemaData={schemaData}
   image={imageSrc}
+  breadcrumbs={breadcrumbs}
 >
   <div class="max-w-4xl mx-auto px-4 mt-6 sm:mt-10 animate-fade-in">
     <Blog selectedSlug={post.slug} client:load />

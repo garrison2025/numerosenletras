@@ -6,19 +6,47 @@ const title = "Letras Burbuja Ⓑⓤⓡⓑⓤⓙⓐ | Fuentes Circulares para Co
 const description = "Generador de fuentes de burbuja y letras con círculos. Convierte tu texto ordinario en elegantes tipografías esféricas al instante de forma gratuita.";
 const keywords = "letras burbuja, letras burbuja copiar y pegar, fuentes circulares, letras con circulos, generador de letras burbuja";
 
-const schemaData = {
-  "@context": "https://schema.org",
-  "@type": "WebApplication",
-  "name": "Letras Burbuja - Fuentes Circulares",
-  "url": "https://numerosenletras.org/letras-burbuja",
-  "description": description,
-  "applicationCategory": "EducationalApplication",
-  "operatingSystem": "All",
-  "browserRequirements": "Requires JavaScript. Requires HTML5."
-};
+const schemaData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Letras Burbuja - Fuentes Circulares",
+    "url": "https://numerosenletras.org/letras-burbuja",
+    "description": description,
+    "applicationCategory": "EducationalApplication",
+    "operatingSystem": "All",
+    "browserRequirements": "Requires JavaScript. Requires HTML5."
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "¿Cómo generar y copiar letras burbuja para redes sociales?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Simplemente escribe tu frase o nombre en el campo de texto, selecciona el estilo de círculos (blancos o negros) y haz clic en Copiar para pegarlo directamente en Instagram, TikTok o WhatsApp."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "¿Son compatibles las letras burbuja con todos los teléfonos y apps?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Sí, las letras burbuja utilizan caracteres Unicode estándar (Enclosed Alphanumerics) compatibles con Android, iOS, Windows, Mac y la mayoría de aplicaciones de mensajería y redes sociales."
+        }
+      }
+    ]
+  }
+];
+const breadcrumbs = [
+  { name: "Inicio", path: "/" },
+  { name: "Letras Burbuja", path: "/letras-burbuja" }
+];
 ---
 
-<Layout title={title} description={description} keywords={keywords} currentPath="/letras-burbuja" schemaData={schemaData}>
+<Layout title={title} description={description} keywords={keywords} currentPath="/letras-burbuja" schemaData={schemaData} breadcrumbs={breadcrumbs}>
   <div class="max-w-4xl mx-auto px-4 mt-6 sm:mt-10">
     <BubbleLetters client:load />
   </div>
