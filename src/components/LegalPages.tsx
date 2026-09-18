@@ -372,7 +372,7 @@ export function PrivacyPolicy() {
             </p>
             <ul className="list-disc pl-5 space-y-2 text-xs sm:text-sm text-gray-500">
               <li>
-                <strong>LocalStorage y Cookies Funcionales:</strong> Se emplean exclusivamente en tu propio dispositivo para almacenar de forma encriptada y 100% local tus preferencias de idioma, formato de separadores numéricos y tu historial de conversiones favoritas. Ninguno de estos datos se envía a servidores externos.
+                <strong>LocalStorage y Almacenamiento Local del Navegador:</strong> Se emplean en tu propio navegador para recordar tus preferencias de formato (como estilo de separadores numéricos) y el historial de conversiones si decides mantenerlo activo. Este almacenamiento es estrictamente local en tu navegador y puede limpiarse o desactivarse en cualquier momento desde el convertidor o borrando los datos del navegador. Los números introducidos no se transmiten a servidores externos.
               </li>
               <li>
                 <strong>Google Analytics (con anonimización de IP):</strong> Recopila datos de tráfico estadísticos no identificables (como tipo de navegador, sistema operativo y páginas visitadas) con la única finalidad de optimizar el rendimiento y mejorar la calidad didáctica de nuestras herramientas.

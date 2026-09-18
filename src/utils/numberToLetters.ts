@@ -1,26 +1,75 @@
 /**
  * Spanish number to words converter.
- * Converts numbers into proper Spanish text with precise grammar rules.
+ * Converts numbers into proper Spanish text with precise grammar rules conforming to RAE standards.
  */
 
-const UNITS = ["", "un", "dos", "tres", "cuatro", "cinco", "seis", "siete", "ocho", "nueve"];
+export interface CurrencyConfig {
+  code: string;
+  singular: string;
+  plural: string;
+  centSingular: string;
+  centPlural: string;
+  financialSuffix: string;
+}
+
+export const CURRENCY_CONFIGS: Record<string, CurrencyConfig> = {
+  MXN: {
+    code: "MXN",
+    singular: "peso",
+    plural: "pesos",
+    centSingular: "centavo",
+    centPlural: "centavos",
+    financialSuffix: "M.N."
+  },
+  USD: {
+    code: "USD",
+    singular: "dólar",
+    plural: "dólares",
+    centSingular: "centavo",
+    centPlural: "centavos",
+    financialSuffix: "USD"
+  },
+  EUR: {
+    code: "EUR",
+    singular: "euro",
+    plural: "euros",
+    centSingular: "céntimo",
+    centPlural: "céntimos",
+    financialSuffix: ""
+  },
+  COP: {
+    code: "COP",
+    singular: "peso",
+    plural: "pesos",
+    centSingular: "centavo",
+    centPlural: "centavos",
+    financialSuffix: "COP"
+  },
+  PEN: {
+    code: "PEN",
+    singular: "sol",
+    plural: "soles",
+    centSingular: "céntimo",
+    centPlural: "céntimos",
+    financialSuffix: "PEN"
+  },
+  ARS: {
+    code: "ARS",
+    singular: "peso",
+    plural: "pesos",
+    centSingular: "centavo",
+    centPlural: "centavos",
+    financialSuffix: "ARS"
+  }
+};
+
 const UNITS_MASCULINE = ["", "uno", "dos", "tres", "cuatro", "cinco", "seis", "siete", "ocho", "nueve"];
 const UNITS_FEMININE = ["", "una", "dos", "tres", "cuatro", "cinco", "seis", "siete", "ocho", "nueve"];
+const UNITS_NEUTRAL = ["", "un", "dos", "tres", "cuatro", "cinco", "seis", "siete", "ocho", "nueve"];
 
 const TENS_10_19 = [
   "diez", "once", "doce", "trece", "catorce", "quince", 
-  "dieciséis", "diecisiete", "diecho", "diecinueve"
-];
-
-// Correct orthography for 10-19
-const TENS_10_19_CORRECT = [
-  "diez", "once", "doce", "trece", "catorce", "quince", 
   "dieciséis", "diecisiete", "dieciocho", "diecinueve"
-];
-
-const TENS_20_29 = [
-  "veinte", "veintiún", "veintidós", "veintitrés", "veinticuatro", 
-  "veinticinco", "veintiséis", "veintidos", "veintiocho", "veintinueve"
 ];
 
 const TENS_20_29_MASCULINE = [
@@ -33,127 +82,141 @@ const TENS_20_29_FEMININE = [
   "veinticinco", "veintiséis", "veintisiete", "veintiocho", "veintinueve"
 ];
 
+const TENS_20_29_NEUTRAL = [
+  "veinte", "veintiún", "veintidós", "veintitrés", "veinticuatro", 
+  "veinticinco", "veintiséis", "veintisiete", "veintiocho", "veintinueve"
+];
+
 const TENS_30_90 = [
   "", "", "", "treinta", "cuarenta", "cincuenta", "sesenta", "setenta", "ochenta", "noventa"
 ];
 
-const HUNDREDS = [
-  "", "cien", "doscientos", "trescientos", "cuatrocientos", "quinientos", 
-  "seiscientos", "setecientos", "ochocientos", "novecientos"
+const HUNDREDS_MASCULINE = [
+  "", "ciento", "doscientos", "trescientos", "cuatrocientos", 
+  "quinientos", "seiscientos", "setecientos", "ochocientos", "novecientos"
 ];
 
 const HUNDREDS_FEMININE = [
-  "", "cien", "doscentas", "trescientas", "cuatrocientas", "quinientas", 
-  "seiscientas", "setecientas", "ochocientas", "novecientas"
-];
-
-// Correct feminine spelling for hundreds
-const HUNDREDS_FEMININE_CORRECT = [
-  "", "cien", "doscientas", "trescientas", "cuatrocientas", "quinientas", 
-  "seiscientas", "setecientas", "ochocientas", "novecientas"
+  "", "ciento", "doscientas", "trescientas", "cuatrocientas", 
+  "quinientas", "seiscientas", "setecientas", "ochocientas", "novecientas"
 ];
 
 /**
- * Helper to convert a three-digit group (0-999) to words.
+ * Converts a 3-digit number (0-999) into Spanish words.
  */
-function convertGroupOfThree(num: number, gender: 'M' | 'F' | 'N'): string {
+function convertGroupOfThree(num: number, gender: 'M' | 'F' | 'N' = 'M'): string {
   if (num === 0) return "";
+  if (num === 100) return "cien";
 
-  let words = "";
-  const h = Math.floor(num / 100);
-  const t = Math.floor((num % 100) / 10);
-  const u = num % 10;
+  let result = "";
+  const hundreds = Math.floor(num / 100);
+  const remainder = num % 100;
 
-  // Hundreds
-  if (h > 0) {
-    if (h === 1 && (t > 0 || u > 0)) {
-      words += "ciento ";
-    } else {
-      if (gender === 'F') {
-        words += HUNDREDS_FEMININE_CORRECT[h] + " ";
-      } else {
-        words += HUNDREDS[h] + " ";
-      }
-    }
+  if (hundreds > 0) {
+    const hundredsList = gender === 'F' ? HUNDREDS_FEMININE : HUNDREDS_MASCULINE;
+    result += hundredsList[hundreds];
+    if (remainder > 0) result += " ";
   }
 
-  // Tens and Units
-  const remainder = num % 100;
   if (remainder > 0) {
     if (remainder < 10) {
-      if (gender === 'M') {
-        words += UNITS_MASCULINE[remainder];
-      } else if (gender === 'F') {
-        words += UNITS_FEMININE[remainder];
-      } else { // Neutral/Adjective (e.g. before "mil" or in standard counting)
-        words += UNITS[remainder];
-      }
+      const unitsList = gender === 'F' ? UNITS_FEMININE : (gender === 'N' ? UNITS_NEUTRAL : UNITS_MASCULINE);
+      result += unitsList[remainder];
     } else if (remainder >= 10 && remainder < 20) {
-      words += TENS_10_19_CORRECT[remainder - 10];
+      result += TENS_10_19[remainder - 10];
     } else if (remainder >= 20 && remainder < 30) {
-      if (remainder === 21) {
-        if (gender === 'M') words += TENS_20_29_MASCULINE[1];
-        else if (gender === 'F') words += TENS_20_29_FEMININE[1];
-        else words += "veintiún";
-      } else {
-        words += TENS_20_29_MASCULINE[remainder - 20];
-      }
-    } else { // 30-99
-      words += TENS_30_90[t];
-      if (u > 0) {
-        let unitStr = "";
-        if (gender === 'M') unitStr = UNITS_MASCULINE[u];
-        else if (gender === 'F') unitStr = UNITS_FEMININE[u];
-        else unitStr = UNITS[u];
-        words += " y " + unitStr;
+      const tens20List = gender === 'F' ? TENS_20_29_FEMININE : (gender === 'N' ? TENS_20_29_NEUTRAL : TENS_20_29_MASCULINE);
+      result += tens20List[remainder - 20];
+    } else {
+      const tens = Math.floor(remainder / 10);
+      const units = remainder % 10;
+      result += TENS_30_90[tens];
+      if (units > 0) {
+        const unitsList = gender === 'F' ? UNITS_FEMININE : (gender === 'N' ? UNITS_NEUTRAL : UNITS_MASCULINE);
+        result += " y " + unitsList[units];
       }
     }
   }
 
-  return words.trim();
+  return result.trim();
 }
 
 export interface ConvertOptions {
-  gender?: 'M' | 'F' | 'N'; // M: masculine (uno), F: feminine (una), N: neutral (un) - default M
-  isCurrency?: boolean;     // If true, applies financial currency suffix formats
-  currencyName?: string;    // e.g. "pesos", "euros", "dólares"
-  currencyCentName?: string; // e.g. "centavos", "céntimos"
-  formatFinancial?: boolean; // If true, formats as "pesos 50/100 M.N." or similar standard
+  gender?: 'M' | 'F' | 'N';
+  currency?: CurrencyConfig;
+  isCurrency?: boolean;
+  currencyName?: string;
+  currencyCentName?: string;
+  formatFinancial?: boolean;
+  decimalMode?: 'fraction' | 'words';
+  capitalize?: boolean;
 }
 
+/**
+ * Converts any number (integer or decimal, positive or negative) into Spanish words.
+ */
 export function convertNumberToLetters(
-  value: number | string,
-  options: ConvertOptions = {}
+  num: number | string, 
+  options?: ConvertOptions
 ): string {
-  const {
-    gender = 'M',
-    isCurrency = false,
-    currencyName = "pesos",
-    currencyCentName = "centavos",
-    formatFinancial = false
-  } = options;
+  const gender = options?.gender || 'M';
+  const isCapitalize = options?.capitalize === true;
 
-  // Parse input
-  const numString = typeof value === 'number' ? value.toFixed(2) : String(value);
-  const cleanStr = numString.replace(/,/g, '').trim();
-  const parts = cleanStr.split('.');
-  
-  const integerPart = parseInt(parts[0], 10);
-  const decimalPartString = parts[1] ? parts[1].substring(0, 2).padEnd(2, '0') : '00';
-  const decimalPart = parseInt(decimalPartString, 10);
-
-  if (isNaN(integerPart)) {
-    return "Cero";
+  // Resolve currency config if provided
+  let currencyCfg: CurrencyConfig | null = null;
+  if (options?.currency) {
+    currencyCfg = options.currency;
+  } else if (options?.isCurrency) {
+    currencyCfg = {
+      code: "CUSTOM",
+      singular: options.currencyName || "peso",
+      plural: options.currencyName || "pesos",
+      centSingular: options.currencyCentName || "centavo",
+      centPlural: options.currencyCentName || "centavos",
+      financialSuffix: "M.N."
+    };
   }
 
-  if (integerPart === 0 && decimalPart === 0) {
-    if (isCurrency) {
-      if (formatFinancial) {
-        return `Cero ${currencyName} 00/100 M.N.`.trim();
-      }
-      return `Cero ${currencyName}`.trim();
+  const isFinancial = options?.formatFinancial !== false && (Boolean(currencyCfg) || options?.formatFinancial === true);
+  const decimalMode = options?.decimalMode || (currencyCfg ? (options?.formatFinancial === false ? 'words' : 'fraction') : 'words');
+
+  // String cleaning
+  let numStr = String(num).trim();
+  if (!numStr || numStr === "-") return "cero";
+
+  // Check negative
+  let isNegative = false;
+  if (numStr.startsWith("-")) {
+    isNegative = true;
+    numStr = numStr.substring(1).trim();
+  }
+
+  // Handle standard decimal separator (dot or comma)
+  // If format is 1.234,56 replace dots as thousand sep and comma as decimal sep
+  if (numStr.includes(",") && !numStr.includes(".")) {
+    numStr = numStr.replace(",", ".");
+  } else if (numStr.includes(".") && numStr.includes(",")) {
+    const lastDot = numStr.lastIndexOf(".");
+    const lastComma = numStr.lastIndexOf(",");
+    if (lastComma > lastDot) {
+      // European 1.234,56
+      numStr = numStr.replace(/\./g, "").replace(",", ".");
+    } else {
+      // US 1,234.56
+      numStr = numStr.replace(/,/g, "");
     }
-    return "Cero";
+  }
+
+  const parts = numStr.split(".");
+  const rawIntegerStr = parts[0] ? parts[0].replace(/^0+(?=\d)/, "") : "0";
+  const integerPart = parseInt(rawIntegerStr || "0", 10);
+  
+  const rawDecimalStr = parts[1] || "";
+  const decimalPartString = rawDecimalStr.substring(0, 2).padEnd(2, '0');
+  const decimalPart = parseInt(decimalPartString || "0", 10);
+
+  if (isNaN(integerPart)) {
+    return isCapitalize ? "Cero" : "cero";
   }
 
   let words = "";
@@ -171,49 +234,51 @@ export function convertNumberToLetters(
 
     // groups[0]: units, tens, hundreds
     // groups[1]: thousands (mil)
-    // groups[2]: millions (millón)
+    // groups[2]: millions (millón/millones)
     // groups[3]: thousands of millions (mil millones)
-    // groups[4]: billions (billón)
+    // groups[4]: billions (billón/billones)
 
     for (let i = groups.length - 1; i >= 0; i--) {
       const g = groups[i];
       if (g === 0) continue;
 
-      let groupWords = "";
-      
-      // Determine gender for unit group
+      // In currency mode or when qualifying masculine nouns, final group of units uses 'N' (apocope: un)
       let groupGender: 'M' | 'F' | 'N' = 'N';
       if (i === 0) {
-        groupGender = gender; // Use target gender for the final group
+        groupGender = currencyCfg ? 'N' : gender;
       }
 
-      groupWords = convertGroupOfThree(g, groupGender);
+      const groupWords = convertGroupOfThree(g, groupGender);
 
-      if (i === 1) { // Thousands (mil)
+      if (i === 1) {
+        // Thousands: RAE standard is 'mil', never 'un mil'
         if (g === 1) {
           words += "mil ";
         } else {
           words += groupWords + " mil ";
         }
-      } else if (i === 2) { // Millions (millón/millones)
+      } else if (i === 2) {
+        // Millions: 'un millón' or 'X millones'
         if (g === 1) {
           words += "un millón ";
         } else {
           words += groupWords + " millones ";
         }
-      } else if (i === 3) { // Billions of units (mil millones)
+      } else if (i === 3) {
+        // Thousands of millions
         if (g === 1) {
           words += "mil millones ";
         } else {
           words += groupWords + " mil millones ";
         }
-      } else if (i === 4) { // Trillions (billón/billones)
+      } else if (i === 4) {
+        // Billions (10^12)
         if (g === 1) {
           words += "un billón ";
         } else {
           words += groupWords + " billones ";
         }
-      } else { // Units
+      } else {
         words += groupWords + " ";
       }
     }
@@ -221,49 +286,67 @@ export function convertNumberToLetters(
 
   words = words.trim();
 
-  // If currency formatting is requested
-  if (isCurrency) {
-    // Standard rule: if the number is exactly millions (e.g. 1,000,000), it's followed by "de" before the currency
-    // e.g. "Un millón de pesos", "Dos millones de dólares"
-    // But NOT "Un millón quinientos mil pesos". Check if ends with "millón" or "millones"
-    let currencyConnector = " ";
-    const checkWords = words.trim().toLowerCase();
+  // If currency formatting
+  if (currencyCfg) {
+    // Connector " de " for exact millions / billions
+    let connector = " ";
+    const lowerWords = words.toLowerCase();
     if (
-      integerPart > 0 && 
-      (integerPart % 1000000 === 0 || 
-       checkWords.endsWith("millón") || 
-       checkWords.endsWith("millones") || 
-       checkWords.endsWith("billón") || 
-       checkWords.endsWith("billones") ||
-       checkWords.endsWith("millardo") ||
-       checkWords.endsWith("millardos"))
+      integerPart > 0 &&
+      (integerPart % 1000000 === 0 ||
+       lowerWords.endsWith("millón") ||
+       lowerWords.endsWith("millones") ||
+       lowerWords.endsWith("billón") ||
+       lowerWords.endsWith("billones"))
     ) {
-      currencyConnector = " de ";
+      connector = " de ";
     }
 
-    if (formatFinancial) {
-      // e.g., "Mil quinientos cuarenta pesos 50/100 M.N."
-      words = `${words}${currencyConnector}${currencyName} ${decimalPartString}/100 M.N.`;
+    const currencyName = integerPart === 1 ? currencyCfg.singular : currencyCfg.plural;
+    const suffix = currencyCfg.financialSuffix ? ` ${currencyCfg.financialSuffix}` : "";
+
+    if (decimalMode === 'fraction') {
+      words = `${words}${connector}${currencyName} ${decimalPartString}/100${suffix}`;
     } else {
-      // e.g., "Mil quinientos cuarenta pesos con cincuenta centavos"
-      const decimalWords = decimalPart > 0 ? convertGroupOfThree(decimalPart, gender) : "";
+      // decimalMode === 'words'
       if (decimalPart > 0) {
-        words = `${words}${currencyConnector}${currencyName} con ${decimalWords} ${currencyCentName}`;
+        const centName = decimalPart === 1 ? currencyCfg.centSingular : currencyCfg.centPlural;
+        const centWords = convertGroupOfThree(decimalPart, 'N');
+        words = `${words}${connector}${currencyName} con ${centWords} ${centName}${suffix}`;
       } else {
-        words = `${words}${currencyConnector}${currencyName}`;
+        words = `${words}${connector}${currencyName}${suffix}`;
       }
     }
   } else {
-    // Normal non-currency decimal spelling
-    if (decimalPart > 0) {
-      const decimalWords = convertGroupOfThree(decimalPart, gender);
-      words = `${words} con ${decimalWords}`;
+    // Non-currency decimal
+    if (parts.length > 1 && rawDecimalStr.length > 0) {
+      if (rawDecimalStr.startsWith("0")) {
+        // E.g. 1.01 -> uno punto cero uno
+        const decWords = rawDecimalStr
+          .split("")
+          .map(d => {
+            const digit = parseInt(d, 10);
+            return digit === 0 ? "cero" : UNITS_MASCULINE[digit];
+          })
+          .join(" ");
+        words = `${words} punto ${decWords}`;
+      } else {
+        const decVal = parseInt(rawDecimalStr, 10);
+        if (!isNaN(decVal) && decVal > 0) {
+          const decWords = decVal < 1000 ? convertGroupOfThree(decVal, gender) : convertNumberToLetters(decVal, { gender });
+          words = `${words} punto ${decWords}`;
+        }
+      }
     }
   }
 
-  // Capitalize first letter
+  if (isNegative && words !== "cero") {
+    words = `menos ${words}`;
+  }
+
   words = words.trim();
-  if (words.length > 0) {
+
+  if (isCapitalize && words.length > 0) {
     words = words.charAt(0).toUpperCase() + words.slice(1);
   }
 

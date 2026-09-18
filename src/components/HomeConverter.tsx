@@ -1,8 +1,10 @@
 import { useState, useEffect, useRef, MouseEvent } from "react";
 import { 
   convertNumberToLetters, 
-  ConvertOptions 
+  ConvertOptions,
+  CurrencyConfig 
 } from "../utils/numberToLetters";
+import { HOME_FAQS } from "../data/faqs";
 import { 
   Copy, 
   Check, 
@@ -36,6 +38,7 @@ interface HistoryItem {
 interface CurrencyPreset {
   code: string;
   name: string;
+  singular: string;
   plural: string;
   centName: string;
   centPlural: string;
@@ -44,22 +47,22 @@ interface CurrencyPreset {
 }
 
 const CURRENCY_PRESETS: Record<string, CurrencyPreset> = {
-  MXN: { code: "MXN", name: "Peso Mexicano", plural: "pesos", centName: "centavo", centPlural: "centavos", symbol: "$", suffix: "M.N." },
-  USD: { code: "USD", name: "Dólar Americano", plural: "dólares", centName: "centavo", centPlural: "centavos", symbol: "$", suffix: "USD" },
-  EUR: { code: "EUR", name: "Euro", plural: "euros", centName: "céntimo", centPlural: "céntimos", symbol: "€", suffix: "" },
-  COP: { code: "COP", name: "Peso Colombiano", plural: "pesos", centName: "centavo", centPlural: "centavos", symbol: "$", suffix: "M/CTE" },
-  PEN: { code: "PEN", name: "Sol Peruano", plural: "soles", centName: "céntimo", centPlural: "céntimos", symbol: "S/", suffix: "y CTS." },
-  ARS: { code: "ARS", name: "Peso Argentino", plural: "pesos", centName: "centavo", centPlural: "centavos", symbol: "$", suffix: "ARS" },
-  CLP: { code: "CLP", name: "Peso Chileno", plural: "pesos", centName: "centavo", centPlural: "centavos", symbol: "$", suffix: "CLP" },
-  VES: { code: "VES", name: "Bolívar Venezolano", plural: "bolívares", centName: "céntimo", centPlural: "céntimos", symbol: "Bs.S", suffix: "V.S." },
-  BOB: { code: "BOB", name: "Boliviano", plural: "bolivianos", centName: "centavo", centPlural: "centavos", symbol: "Bs", suffix: "BOB" },
-  GTQ: { code: "GTQ", name: "Quetzal Guatemalteco", plural: "quetzales", centName: "centavo", centPlural: "centavos", symbol: "Q", suffix: "GTQ" },
-  CRC: { code: "CRC", name: "Colón Costarricense", plural: "colones", centName: "céntimo", centPlural: "céntimos", symbol: "₡", suffix: "CRC" },
-  HNL: { code: "HNL", name: "Lempira Hondureño", plural: "lempiras", centName: "centavo", centPlural: "centavos", symbol: "L", suffix: "HNL" },
-  NIO: { code: "NIO", name: "Córdoba Nicaragüense", plural: "córdobas", centName: "centavo", centPlural: "centavos", symbol: "C$", suffix: "NIO" },
-  PYG: { code: "PYG", name: "Guaraní Paraguayo", plural: "guaraníes", centName: "centavo", centPlural: "centavos", symbol: "₲", suffix: "PYG" },
-  UYU: { code: "UYU", name: "Peso Uruguayo", plural: "pesos", centName: "centésimo", centPlural: "centésimos", symbol: "$U", suffix: "UYU" },
-  DOP: { code: "DOP", name: "Peso Dominicano", plural: "pesos", centName: "centavo", centPlural: "centavos", symbol: "RD$", suffix: "DOP" }
+  MXN: { code: "MXN", name: "Peso Mexicano", singular: "peso", plural: "pesos", centName: "centavo", centPlural: "centavos", symbol: "$", suffix: "M.N." },
+  USD: { code: "USD", name: "Dólar Americano", singular: "dólar", plural: "dólares", centName: "centavo", centPlural: "centavos", symbol: "$", suffix: "USD" },
+  EUR: { code: "EUR", name: "Euro", singular: "euro", plural: "euros", centName: "céntimo", centPlural: "céntimos", symbol: "€", suffix: "" },
+  COP: { code: "COP", name: "Peso Colombiano", singular: "peso", plural: "pesos", centName: "centavo", centPlural: "centavos", symbol: "$", suffix: "M/CTE" },
+  PEN: { code: "PEN", name: "Sol Peruano", singular: "sol", plural: "soles", centName: "céntimo", centPlural: "céntimos", symbol: "S/", suffix: "y CTS." },
+  ARS: { code: "ARS", name: "Peso Argentino", singular: "peso", plural: "pesos", centName: "centavo", centPlural: "centavos", symbol: "$", suffix: "ARS" },
+  CLP: { code: "CLP", name: "Peso Chileno", singular: "peso", plural: "pesos", centName: "centavo", centPlural: "centavos", symbol: "$", suffix: "CLP" },
+  VES: { code: "VES", name: "Bolívar Venezolano", singular: "bolívar", plural: "bolívares", centName: "céntimo", centPlural: "céntimos", symbol: "Bs.S", suffix: "V.S." },
+  BOB: { code: "BOB", name: "Boliviano", singular: "boliviano", plural: "bolivianos", centName: "centavo", centPlural: "centavos", symbol: "Bs", suffix: "BOB" },
+  GTQ: { code: "GTQ", name: "Quetzal Guatemalteco", singular: "quetzal", plural: "quetzales", centName: "centavo", centPlural: "centavos", symbol: "Q", suffix: "GTQ" },
+  CRC: { code: "CRC", name: "Colón Costarricense", singular: "colón", plural: "colones", centName: "céntimo", centPlural: "céntimos", symbol: "₡", suffix: "CRC" },
+  HNL: { code: "HNL", name: "Lempira Hondureño", singular: "lempira", plural: "lempiras", centName: "centavo", centPlural: "centavos", symbol: "L", suffix: "HNL" },
+  NIO: { code: "NIO", name: "Córdoba Nicaragüense", singular: "córdoba", plural: "córdobas", centName: "centavo", centPlural: "centavos", symbol: "C$", suffix: "NIO" },
+  PYG: { code: "PYG", name: "Guaraní Paraguayo", singular: "guaraní", plural: "guaraníes", centName: "centavo", centPlural: "centavos", symbol: "₲", suffix: "PYG" },
+  UYU: { code: "UYU", name: "Peso Uruguayo", singular: "peso", plural: "pesos", centName: "centésimo", centPlural: "centésimos", symbol: "$U", suffix: "UYU" },
+  DOP: { code: "DOP", name: "Peso Dominicano", singular: "peso", plural: "pesos", centName: "centavo", centPlural: "centavos", symbol: "RD$", suffix: "DOP" }
 };
 
 const CURRENCY_INFO: Record<string, { flag: string, country: string }> = {
@@ -129,6 +132,25 @@ export default function HomeConverter({ initialNumber, onNavigate }: { initialNu
   const [showCurrencyPanel, setShowCurrencyPanel] = useState(false);
   const [currencyRegion, setCurrencyRegion] = useState<"all" | "north-central" | "south" | "europe">("all");
   const [openHomeFaq, setOpenHomeFaq] = useState<number | null>(null);
+
+  const [historyEnabled, setHistoryEnabled] = useState(() => {
+    try {
+      return localStorage.getItem("history_enabled") !== "false";
+    } catch {
+      return true;
+    }
+  });
+
+  const toggleHistoryEnabled = () => {
+    setHistoryEnabled(prev => {
+      const next = !prev;
+      try {
+        localStorage.setItem("history_enabled", String(next));
+      } catch {}
+      showToast(next ? "Historial activado" : "Historial desactivado");
+      return next;
+    });
+  };
 
   // Interactive Cheque mockup and History search states
   const [searchHistoryQuery, setSearchHistoryQuery] = useState("");
@@ -354,25 +376,19 @@ export default function HomeConverter({ initialNumber, onNavigate }: { initialNu
       let convertedText = "";
       if (isCurrencyMode) {
         const preset = CURRENCY_PRESETS[currencyPreset] || CURRENCY_PRESETS.MXN;
+        const currencyCfg: CurrencyConfig = {
+          code: preset.code,
+          singular: preset.singular,
+          plural: preset.plural,
+          centSingular: preset.centName,
+          centPlural: preset.centPlural,
+          financialSuffix: preset.suffix
+        };
         convertedText = convertNumberToLetters(positiveVal, {
-          gender: 'N', // neutral "un pesos" / "un mil" is standard for currency
-          isCurrency: true,
-          currencyName: preset.plural,
-          currencyCentName: preset.centPlural,
-          formatFinancial: isFinancialFormat
+          currency: currencyCfg,
+          formatFinancial: isFinancialFormat,
+          decimalMode: isFinancialFormat ? 'fraction' : 'words'
         });
-        
-        // Append additional suffix if needed
-        if (isFinancialFormat && preset.suffix) {
-          if (!convertedText.endsWith(preset.suffix)) {
-            // Find if M.N. exists to replace, or append
-            if (convertedText.includes("M.N.")) {
-              convertedText = convertedText.replace("M.N.", preset.suffix);
-            } else {
-              convertedText = `${convertedText} ${preset.suffix}`;
-            }
-          }
-        }
       } else {
         convertedText = convertNumberToLetters(positiveVal, { gender });
       }
@@ -410,7 +426,7 @@ export default function HomeConverter({ initialNumber, onNavigate }: { initialNu
   }, [inputVal, gender, letterCase, isCurrencyMode, currencyPreset, isFinancialFormat, numberFormatStyle]);
 
   const saveToHistory = (num: string, textStr: string) => {
-    if (!num || num === "-" || isNaN(Number(num)) || textStr.startsWith("Entrada no")) return;
+    if (!historyEnabled || !num || num === "-" || isNaN(Number(num)) || textStr.startsWith("Entrada no")) return;
     
     setHistory((prev) => {
       // Avoid duplicate consecutive entries
@@ -1317,17 +1333,27 @@ export default function HomeConverter({ initialNumber, onNavigate }: { initialNu
           <div className="flex items-center justify-between mb-4 border-b border-gray-100 pb-2.5">
             <div className="flex items-center space-x-2 text-gray-800">
               <History className="w-4 h-4 text-gray-400" />
-              <h3 className="font-sans font-semibold text-sm tracking-tight">Historial RAE</h3>
+              <h3 className="font-sans font-semibold text-sm tracking-tight">Historial</h3>
             </div>
-            {history.length > 0 && (
-              <button 
-                onClick={handleClearHistory}
-                className="text-xs text-red-500 hover:text-red-700 flex items-center gap-1 font-sans cursor-pointer"
+            <div className="flex items-center gap-2">
+              <button
+                onClick={toggleHistoryEnabled}
+                className="text-[11px] text-gray-500 hover:text-gray-700 font-sans cursor-pointer underline"
+                title={historyEnabled ? "Desactivar guardado de historial local" : "Activar guardado de historial local"}
               >
-                <Trash2 className="w-3 h-3" />
-                Limpiar
+                {historyEnabled ? "Desactivar" : "Activar"}
               </button>
-            )}
+              {history.length > 0 && (
+                <button 
+                  onClick={handleClearHistory}
+                  className="text-xs text-red-500 hover:text-red-700 flex items-center gap-1 font-sans cursor-pointer"
+                  title="Borrar historial"
+                >
+                  <Trash2 className="w-3 h-3" />
+                  Limpiar
+                </button>
+              )}
+            </div>
           </div>
 
           {history.length > 0 && (
@@ -1408,6 +1434,9 @@ export default function HomeConverter({ initialNumber, onNavigate }: { initialNu
                 ))}
             </div>
           )}
+          <p className="text-[10px] text-gray-400 mt-3 border-t border-gray-100 pt-2 font-sans leading-tight">
+            Los números introducidos no se envían a nuestros servidores. El historial de conversiones puede almacenarse localmente en el navegador del usuario.
+          </p>
         </div>
 
         {/* Guides Column (Spans 2 columns on medium screens) */}
@@ -1452,8 +1481,8 @@ export default function HomeConverter({ initialNumber, onNavigate }: { initialNu
               <div className="p-3.5 bg-gray-50/50 rounded-xl border border-gray-100/80 hover:bg-blue-50/10 transition-colors">
                 <div className="flex items-start justify-between gap-3">
                   <div className="text-xs text-gray-600 font-sans leading-relaxed">
-                    <p className="font-semibold text-gray-900 mb-1">3. Uso de "un mil" vs "mil":</p>
-                    Se desaconseja el uso de "un mil" para la cifra 1000 de forma aislada, prefiriéndose simplemente <strong>"mil"</strong>. Sin embargo, para millones se usa siempre el artículo singular: <strong>"un millón"</strong>.
+                    <p className="font-semibold text-gray-900 mb-1">3. Uso de "mil" vs "un mil":</p>
+                    La norma lingüística de la RAE establece el uso de <strong>"mil"</strong> (ej. <em>mil pesos</em>), considerándose redundante anteponer "un" en la lengua general. No obstante, en la práctica bancaria y notarial de cheques a veces se acostumbra escribir "un mil" para dificultar adulteraciones manuales. Para los millones, la norma general sí exige el numeral: <strong>"un millón"</strong>.
                   </div>
                   <button 
                     onClick={() => { setInputVal("1000"); showToast("Ejemplo de regla 3 cargado: 1000"); }}
@@ -1724,28 +1753,7 @@ export default function HomeConverter({ initialNumber, onNavigate }: { initialNu
         </div>
 
         <div className="space-y-3">
-          {[
-            {
-              q: "¿Cómo se escriben los centavos o céntimos con letras?",
-              a: "Según la Real Academia Española (RAE) y la normativa bancaria general, para cantidades de dinero es preferible expresar los decimales en forma de fracción (ej. '50/100 M.N.') o como céntimos en palabras (ej. 'cincuenta céntimos'). Nuestra herramienta te permite alternar ambos formatos."
-            },
-            {
-              q: "¿Cuál es la diferencia entre 'ciento' y 'cien' al escribir números?",
-              a: "Se emplea 'cien' exclusivamente para referirse de forma exacta a la cifra 100. En cambio, cuando el número va seguido de decenas o unidades menores, se transforma en 'ciento' (ej. 'ciento cinco', 'ciento ochenta y siete')."
-            },
-            {
-              q: "¿A partir de qué número se separan las cifras con la conjunción 'y'?",
-              a: "Los números del 1 al 30 se escriben siempre en una sola palabra refundida (ej. 'dieciséis', 'veintinueve'). A partir del número 31 en adelante, las decenas y las unidades deben separarse de forma obligatoria mediante la conjunción copulativa 'y' (ej. 'treinta y uno', 'cuarenta y cinco')."
-            },
-            {
-              q: "¿Por qué la cantidad en letras de un cheque tiene prioridad sobre el número?",
-              a: "En el derecho comercial y bancario de la mayoría de los países de habla hispana, si existe cualquier discrepancia o contradicción entre el monto en dígitos y el monto escrito en letras, se considerará legalmente válida la cantidad escrita en letras, como medida de seguridad contra falsificaciones."
-            },
-            {
-              q: "¿Este conversor funciona sin conexión o de forma segura?",
-              a: "Sí, el convertidor está desarrollado en React para ejecutarse de forma 100% local en tu propio navegador. Ninguno de los números, montos, cantidades o textos introducidos se envía a servidores externos, garantizando absoluta seguridad y confidencialidad."
-            }
-          ].map((faq, index) => {
+          {HOME_FAQS.map((faq, index) => {
             const isOpen = openHomeFaq === index;
             return (
               <div 

@@ -1,10 +1,11 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import HomeConverter from '../components/HomeConverter';
+import { HOME_FAQS } from '../data/faqs';
 
 const title = "Conversor de Números a Letras | Escribir Números en Palabras";
 const description = "Herramienta online para convertir números a letras en español de forma instantánea. Ideal para cheques, contratos, facturas y aprender cómo se escribe cualquier cantidad.";
-const keywords = "como se escribe con letra, cómo se escribe con letra, conversor de numeros a letras, números a letras, letras burbuja, letras burbuja copiar y pegar, generador de letras burbuja, letras aesthetic";
+const keywords = "conversor de numeros a letras, numeros en letras, cantidad con letra, numeros a letras, convertir numeros a letras, cómo se escribe con letra";
 
 const schemaData = [
   {
@@ -20,32 +21,14 @@ const schemaData = [
   {
     "@context": "https://schema.org",
     "@type": "FAQPage",
-    "mainEntity": [
-      {
-        "@type": "Question",
-        "name": "¿Cómo convertir números a letras en español al instante?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Simplemente escribe cualquier cifra en el cuadro de texto y nuestra herramienta generará instantáneamente la transcripción formal en palabras según las normas ortográficas de la RAE."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "¿Cómo escribir montos de dinero para llenar cheques y facturas?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Selecciona la divisa de tu país (ej. MXN, USD, EUR, COP, PEN, ARS) para agregar automáticamente el nombre de la moneda y los centavos en fracción sobre cien (ej. 'Un mil quinientos pesos 00/100 M.N.')."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "¿Es gratis el conversor de números a palabras?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Sí, numerosenletras.org es un servicio 100% gratuito y sin registro. Se ejecuta directamente en tu navegador para garantizar máxima privacidad e instantaneidad."
-        }
+    "mainEntity": HOME_FAQS.map(faq => ({
+      "@type": "Question",
+      "name": faq.q,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": faq.a
       }
-    ]
+    }))
   }
 ];
 ---

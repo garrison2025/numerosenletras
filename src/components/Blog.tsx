@@ -23,111 +23,15 @@ import {
 import { convertNumberToLetters } from "../utils/numberToLetters";
 import { AESTHETIC_FONTS } from "../utils/fontGenerators";
 
-const createNumerosLetrasSVG = () => {
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
-    <defs>
-      <linearGradient id="bg1" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#0f172a"/>
-        <stop offset="50%" stop-color="#1e1b4b"/>
-        <stop offset="100%" stop-color="#1e293b"/>
-      </linearGradient>
-      <linearGradient id="cardGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#ffffff" stop-opacity="0.12"/>
-        <stop offset="100%" stop-color="#ffffff" stop-opacity="0.03"/>
-      </linearGradient>
-      <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-        <stop offset="0%" stop-color="#3b82f6"/>
-        <stop offset="50%" stop-color="#8b5cf6"/>
-        <stop offset="100%" stop-color="#ec4899"/>
-      </linearGradient>
-    </defs>
-    <rect width="1200" height="630" fill="url(#bg1)"/>
-    <circle cx="200" cy="150" r="250" fill="#3b82f6" opacity="0.15"/>
-    <circle cx="1000" cy="500" r="300" fill="#8b5cf6" opacity="0.15"/>
-    <rect x="100" y="80" width="1000" height="470" rx="32" fill="url(#cardGrad)" stroke="#ffffff" stroke-opacity="0.18" stroke-width="2"/>
-    <rect x="150" y="130" width="220" height="42" rx="21" fill="#3b82f6" fill-opacity="0.2" stroke="#60a5fa" stroke-width="1.5"/>
-    <text x="260" y="157" font-family="system-ui, sans-serif" font-weight="800" font-size="14" fill="#93c5fd" text-anchor="middle" letter-spacing="2">NORMATIVA RAE 2026</text>
-    <text x="150" y="230" font-family="system-ui, sans-serif" font-weight="900" font-size="46" fill="#ffffff">Convertidor de Números a Letras</text>
-    <text x="150" y="280" font-family="system-ui, sans-serif" font-weight="600" font-size="22" fill="#94a3b8">Guía completa para cheques, contratos y documentos legales</text>
-    <rect x="150" y="320" width="900" height="170" rx="20" fill="#090d16" fill-opacity="0.8" stroke="#334155" stroke-width="1.5"/>
-    <text x="190" y="370" font-family="monospace" font-weight="700" font-size="28" fill="#38bdf8">1.250.450,75 €</text>
-    <text x="450" y="370" font-family="system-ui, sans-serif" font-weight="800" font-size="20" fill="#4ade80">"Un millón doscientos..."</text>
-    <text x="190" y="440" font-family="system-ui, sans-serif" font-weight="600" font-size="18" fill="#cbd5e1">Son: Un millón doscientos cincuenta mil cuatrocientos cincuenta euros con 75/100</text>
-    <rect x="150" y="515" width="900" height="6" rx="3" fill="url(#accentGrad)"/>
-  </svg>`;
-  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
-};
-
-const createLetrasBurbujaSVG = () => {
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
-    <defs>
-      <linearGradient id="bg2" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#31104b"/>
-        <stop offset="50%" stop-color="#6b21a8"/>
-        <stop offset="100%" stop-color="#581c87"/>
-      </linearGradient>
-      <linearGradient id="bubbleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#f472b6"/>
-        <stop offset="100%" stop-color="#c084fc"/>
-      </linearGradient>
-    </defs>
-    <rect width="1200" height="630" fill="url(#bg2)"/>
-    <circle cx="150" cy="120" r="80" fill="#ec4899" opacity="0.25"/>
-    <circle cx="1050" cy="180" r="110" fill="#a855f7" opacity="0.25"/>
-    <circle cx="900" cy="520" r="90" fill="#f43f5e" opacity="0.2"/>
-    <rect x="100" y="80" width="1000" height="470" rx="32" fill="#ffffff" fill-opacity="0.08" stroke="#ffffff" stroke-opacity="0.2" stroke-width="2"/>
-    <rect x="150" y="130" width="240" height="42" rx="21" fill="#f472b6" fill-opacity="0.25" stroke="#f472b6" stroke-width="1.5"/>
-    <text x="270" y="157" font-family="system-ui, sans-serif" font-weight="800" font-size="14" fill="#fbcfe8" text-anchor="middle" letter-spacing="2">TIPOGRAFÍAS REDONDAS</text>
-    <text x="150" y="230" font-family="system-ui, sans-serif" font-weight="900" font-size="48" fill="#ffffff">Letras Burbuja y Redondas</text>
-    <text x="150" y="280" font-family="system-ui, sans-serif" font-weight="600" font-size="22" fill="#e9d5ff">Copiar y pegar símbolos Unicode para Instagram, TikTok y WhatsApp</text>
-    <rect x="150" y="325" width="900" height="160" rx="20" fill="#1e112a" fill-opacity="0.85" stroke="#a855f7" stroke-width="1.5"/>
-    <text x="190" y="380" font-family="sans-serif" font-weight="bold" font-size="34" fill="#f472b6">ⓁⒺⓉⓇⒶⓈ  ⒷⓊⓇⒷ⒊ⒿⒶ</text>
-    <text x="190" y="440" font-family="sans-serif" font-weight="bold" font-size="32" fill="#38bdf8">🅟🅞🅟🅤🅛🅐🅡  ⓈⓉⓎⓁⓄⓈ</text>
-    <rect x="150" y="515" width="900" height="6" rx="3" fill="url(#bubbleGrad)"/>
-  </svg>`;
-  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
-};
-
-const createLetrasAestheticSVG = () => {
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
-    <defs>
-      <linearGradient id="bg3" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#180e29"/>
-        <stop offset="50%" stop-color="#2e1065"/>
-        <stop offset="100%" stop-color="#030712"/>
-      </linearGradient>
-      <linearGradient id="aestGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-        <stop offset="0%" stop-color="#a855f7"/>
-        <stop offset="50%" stop-color="#ec4899"/>
-        <stop offset="100%" stop-color="#f43f5e"/>
-      </linearGradient>
-    </defs>
-    <rect width="1200" height="630" fill="url(#bg3)"/>
-    <text x="160" y="120" font-size="28" fill="#f472b6">✦</text>
-    <text x="1020" y="140" font-size="36" fill="#c084fc">✧</text>
-    <text x="920" y="510" font-size="32" fill="#f472b6">✦</text>
-    <rect x="100" y="80" width="1000" height="470" rx="32" fill="#ffffff" fill-opacity="0.06" stroke="#ffffff" stroke-opacity="0.18" stroke-width="2"/>
-    <rect x="150" y="130" width="250" height="42" rx="21" fill="#a855f7" fill-opacity="0.3" stroke="#c084fc" stroke-width="1.5"/>
-    <text x="275" y="157" font-family="system-ui, sans-serif" font-weight="800" font-size="14" fill="#e9d5ff" text-anchor="middle" letter-spacing="2">GENERADOR DE FUENTES</text>
-    <text x="150" y="230" font-family="system-ui, sans-serif" font-weight="900" font-size="48" fill="#ffffff">Letras Aesthetic &amp; Bonitas</text>
-    <text x="150" y="280" font-family="system-ui, sans-serif" font-weight="600" font-size="22" fill="#d8b4fe">Crea textos con estilo para bios, nicks y estados</text>
-    <rect x="150" y="325" width="900" height="160" rx="20" fill="#0f071a" fill-opacity="0.9" stroke="#e879f9" stroke-width="1.5"/>
-    <text x="190" y="375" font-family="serif" font-weight="bold" font-size="32" fill="#f472b6">𝓐𝓮𝓼𝓽𝓱𝓮𝓽𝓲𝓬  𝓢𝓽𝔂𝓵𝓮𝓼  ✦  ☁️</text>
-    <text x="190" y="440" font-family="monospace" font-weight="bold" font-size="28" fill="#38bdf8">𝕒𝕖𝕤𝕥𝕙𝕖𝕥𝕚𝕔 • ⓈⓉⓎⓁⒺ • [̲̅F][̲̅O][̲̅N][̲̅T][̲̅S]</text>
-    <rect x="150" y="515" width="900" height="6" rx="3" fill="url(#aestGrad)"/>
-  </svg>`;
-  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
-};
+const imgNumerosLetras = "/assets/images/blog_numeros_letras.webp";
+const imgLetrasBurbuja = "/assets/images/blog_letras_burbuja.webp";
+const imgLetrasAesthetic = "/assets/images/blog_letras_aesthetic.webp";
 
 export const SVG_FALLBACKS: Record<string, string> = {
-  "como-convertir-numeros-a-letras": createNumerosLetrasSVG(),
-  "letras-burbuja-redondas": createLetrasBurbujaSVG(),
-  "letras-aesthetic-guia-completa": createLetrasAestheticSVG(),
+  "como-convertir-numeros-a-letras": imgNumerosLetras,
+  "letras-burbuja-redondas": imgLetrasBurbuja,
+  "letras-aesthetic-guia-completa": imgLetrasAesthetic,
 };
-
-const imgNumerosLetras = "/assets/images/blog_numeros_letras.jpg";
-const imgLetrasBurbuja = "/assets/images/blog_letras_burbuja.jpg";
-const imgLetrasAesthetic = "/assets/images/blog_letras_aesthetic.jpg";
 
 export interface BlogPost {
   id: string;
@@ -154,7 +58,7 @@ export const BLOG_POSTS: BlogPost[] = [
     readTime: "12 min de lectura",
     category: "Finanzas",
     keywords: ["numeros en letras", "cantidad con letra", "numeros a letras", "convertir numeros a letras", "cómo se escribe con letra", "convertidor de numeros a letras"],
-    image: SVG_FALLBACKS["como-convertir-numeros-a-letras"] || imgNumerosLetras,
+    image: imgNumerosLetras,
     content: `
       <div class="space-y-8 font-sans text-gray-800 leading-relaxed text-base">
         <!-- Introduction -->
@@ -180,17 +84,20 @@ export const BLOG_POSTS: BlogPost[] = [
         </div>
 
         <div class="my-6">
-          <h2 class="text-2xl font-bold text-gray-900 border-b pb-2 mb-4">2. El Uso del "Un" ante "Mil" y Millones: ¿Redundancia o Precisión Financiera?</h2>
+          <h2 class="text-2xl font-bold text-gray-900 border-b pb-2 mb-4">2. El Uso de "Mil" vs "Un Mil" y Millones: Diferencias Lingüísticas y Práctica Financiera</h2>
           <p class="mb-4">
-            Una de las búsquedas más recurrentes al intentar <a href="https://numerosenletras.org" class="text-blue-600 hover:text-blue-800 font-bold underline">convertir numeros a letras</a> gira en torno a si se debe escribir "mil pesos" o "un mil pesos". La postura académica de la RAE es transparente: en el habla común, el numeral <em>un</em> se omite ante la palabra <em>mil</em> por considerarse redundante. Decimos <em>"mil personas han asistido"</em> o <em>"la obra costó mil dólares"</em>.
+            Una de las dudas más recurrentes al <a href="https://numerosenletras.org" class="text-blue-600 hover:text-blue-800 font-bold underline">convertir números a letras</a> gira en torno a si se debe escribir "mil pesos" o "un mil pesos".
           </p>
           <p class="mb-4">
-            Sin embargo, en el ámbito comercial, bancario y notarial, la inserción del artículo "un" ("un mil") es una práctica extendida y plenamente aceptada. ¿La razón? <strong>Evitar el fraude y la falsificación de documentos</strong>. Si un documento financiero dejara simplemente escrito "mil pesos", un actor malintencionado podría añadir fácilmente palabras delante, alterando el documento a "veintidós mil pesos" o "ciento diez mil pesos". Escribir de forma explícita <strong>"un mil pesos"</strong> sella el inicio de la línea de texto, bloqueando cualquier intento de manipulación analógica.
+            Según la norma lingüística de la Real Academia Española (RAE), en el uso general del idioma el cardinal correspondiente es simplemente <strong>"mil"</strong> (por ejemplo, <em>"mil personas"</em> o <em>"mil pesos"</em>), considerándose redundante anteponer el numeral <em>un</em> en la lengua ordinaria.
+          </p>
+          <p class="mb-4">
+            No obstante, en el ámbito bancario, mercantil y notarial de varios países hispanohablantes es habitual encontrar la fórmula <strong>"un mil"</strong> en cheques y pagarés. Esta práctica tiene una justificación puramente preventiva: busca dificultar que un tercero altere la cifra anteponiendo palabras como "veinte" o "cien". Por lo tanto, mientras que la norma culta académica aconseja "mil", en el llenado de ciertos documentos de pago bancarios se tolera o acostumbra "un mil" por razones de seguridad. En cambio, para los millones la norma siempre exige el numeral: <strong>"un millón"</strong>.
           </p>
           <div class="bg-gray-50 border-l-4 border-indigo-500 p-4 rounded-r-xl my-4">
-            <h4 class="font-bold text-indigo-900 mb-1">💡 Regla de oro para Cheques:</h4>
+            <h4 class="font-bold text-indigo-900 mb-1">💡 Práctica habitual en cheques:</h4>
             <p class="text-sm text-gray-700">
-              Para máxima protección legal al rellenar una <span class="underline decoration-indigo-300 font-semibold">cantidad con letra</span> en un cheque, escriba siempre "Un mil" en lugar de "Mil", y clausure inmediatamente el final del renglón con una línea horizontal continua para que nadie pueda insertar palabras adicionales.
+              Al rellenar una <span class="underline decoration-indigo-300 font-semibold">cantidad con letra</span> en un cheque, tanto "Mil" como "Un mil" son ampliamente aceptados por entidades financieras según el país. Una recomendación de seguridad adicional es trazar una línea horizontal continua al finalizar el texto para evitar que se añadan palabras adicionales en el renglón.
             </p>
           </div>
         </div>
@@ -203,11 +110,11 @@ export const BLOG_POSTS: BlogPost[] = [
           
           <h3 class="text-lg font-bold text-gray-900 mt-4 mb-2">A. El Formato Fraccionario (Estilo de Cheques)</h3>
           <p class="mb-3">
-            Ampliamente utilizado en países como México, Perú, Colombia y Argentina. Consiste en escribir la parte entera en letras y la parte decimal mediante una fracción matemática sobre cien (XX/100), seguida de la designación oficial de la moneda nacional o el sufijo "M.N." (Moneda Nacional).
+            Ampliamente utilizado en países como México, Perú, Colombia y Argentina. Consiste en escribir la parte entera en letras y la parte decimal mediante una fracción matemática sobre cien (XX/100), seguida de la designación oficial de la moneda nacional o el sufijo correspondiente (ej. "M.N.").
           </p>
           <p class="bg-blue-50/50 p-3 rounded-lg font-mono text-sm text-blue-900 border border-blue-100 mb-4">
             <strong>Ejemplo para $1,450.75:</strong><br/>
-            "Un mil cuatrocientos cincuenta pesos 75/100 M.N." o "Mil cuatrocientos cincuenta dólares con setenta y cinco centavos".
+            "Mil cuatrocientos cincuenta pesos 75/100 M.N." o "Mil cuatrocientos cincuenta dólares con setenta y cinco centavos".
           </p>
 
           <h3 class="text-lg font-bold text-gray-900 mt-4 mb-2">B. El Formato Ortográfico Pleno</h3>
@@ -223,7 +130,7 @@ export const BLOG_POSTS: BlogPost[] = [
         <div class="my-6">
           <h2 class="text-2xl font-bold text-gray-900 border-b pb-2 mb-4">4. Los Errores Ortográficos más Comunes que Debes Evitar</h2>
           <p class="mb-4">
-            Al realizar la redacción manual de números en español, es habitual incurrir en vicios ortográficos heredados o malas costumbres orales. Para asegurar un texto impecable, memorice las siguientes correcciones validadas por la RAE:
+            Al realizar la redacción manual de números en español, es habitual incurrir en vicios ortográficos heredados o descuidos en la acentuación. A continuación, repasamos correcciones clave según la normativa académica:
           </p>
           
           <div class="overflow-x-auto my-4 border border-gray-100 rounded-xl">
@@ -239,7 +146,7 @@ export const BLOG_POSTS: BlogPost[] = [
               <tbody class="divide-y divide-gray-100 text-gray-700">
                 <tr>
                   <td class="p-3 font-bold">16</td>
-                  <td class="p-3 text-red-600 line-through">dieciséis</td>
+                  <td class="p-3 text-red-600 line-through">dieciseis</td>
                   <td class="p-3 text-emerald-700 font-bold">dieciséis</td>
                   <td class="p-3">Lleva tilde en la 'e' por ser palabra aguda terminada en 's'.</td>
                 </tr>
@@ -257,15 +164,15 @@ export const BLOG_POSTS: BlogPost[] = [
                 </tr>
                 <tr>
                   <td class="p-3 font-bold">26</td>
-                  <td class="p-3 text-red-600 line-through">dieciseis</td>
-                  <td class="p-3 text-emerald-700 font-bold">dieciséis</td>
-                  <td class="p-3">La vocal fuerte 'e' del diptongo recibe la tilde.</td>
+                  <td class="p-3 text-red-600 line-through">veintiseis</td>
+                  <td class="p-3 text-emerald-700 font-bold">veintiséis</td>
+                  <td class="p-3">Palabra aguda terminada en 's', lleva tilde en la vocal abierta 'e'.</td>
                 </tr>
                 <tr>
                   <td class="p-3 font-bold">100.000</td>
-                  <td class="p-3 text-red-600 line-through">cien mil</td>
+                  <td class="p-3 text-red-600 line-through">cienmil</td>
                   <td class="p-3 text-emerald-700 font-bold">cien mil</td>
-                  <td class="p-3">Se escribe separado en dos vocablos diferenciados.</td>
+                  <td class="p-3">Se escribe en dos palabras separadas (cien mil).</td>
                 </tr>
               </tbody>
             </table>
@@ -307,7 +214,7 @@ export const BLOG_POSTS: BlogPost[] = [
     readTime: "10 min de lectura",
     category: "Diseño",
     keywords: ["letras burbuja", "letras aesthetic copiar y pegar", "letras pequeñas"],
-    image: SVG_FALLBACKS["letras-burbuja-redondas"] || imgLetrasBurbuja,
+    image: imgLetrasBurbuja,
     content: `
       <div class="space-y-8 font-sans text-gray-800 leading-relaxed text-base">
         <!-- Introduction -->
@@ -403,7 +310,7 @@ export const BLOG_POSTS: BlogPost[] = [
     readTime: "11 min de lectura",
     category: "Diseño",
     keywords: ["letras pequeñas", "letras aesthetic copiar y pegar", "convertidor de numeros a letras"],
-    image: SVG_FALLBACKS["letras-aesthetic-guia-completa"] || imgLetrasAesthetic,
+    image: imgLetrasAesthetic,
     content: `
       <div class="space-y-8 font-sans text-gray-800 leading-relaxed text-base">
         <!-- Introduction -->

@@ -1,6 +1,6 @@
 ---
-import Navbar from '../components/Navbar';
-import InterlinkingMatrix from '../components/InterlinkingMatrix';
+import Navbar from '../components/Navbar.astro';
+import InterlinkingMatrix from '../components/InterlinkingMatrix.astro';
 import CookieBanner from '../components/CookieBanner';
 import { BLOG_POSTS } from '../components/Blog';
 import '../index.css';
@@ -24,6 +24,7 @@ const {
 } = Astro.props;
 
 const canonicalUrl = `https://numerosenletras.org${currentPath === "/" ? "" : currentPath}`;
+const fullImageUrl = image.startsWith("http") ? image : `https://numerosenletras.org${image}`;
 
 // Generate dynamic breadcrumbs inside Astro
 const getBreadcrumbs = () => {
@@ -102,14 +103,14 @@ const breadcrumbs = getBreadcrumbs();
     <meta property="og:locale" content="es_ES" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:image" content={image} />
+    <meta property="og:image" content={fullImageUrl} />
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:url" content={canonicalUrl} />
     <meta property="twitter:title" content={title} />
     <meta property="twitter:description" content={description} />
-    <meta property="twitter:image" content={image} />
+    <meta property="twitter:image" content={fullImageUrl} />
 
     <!-- Organization Schema -->
     <script type="application/ld+json" set:html={JSON.stringify({
@@ -125,12 +126,7 @@ const breadcrumbs = getBreadcrumbs();
       "@context": "https://schema.org",
       "@type": "WebSite",
       "name": "numerosenletras.org",
-      "url": "https://numerosenletras.org/",
-      "potentialAction": {
-        "@type": "SearchAction",
-        "target": "https://numerosenletras.org/?q={search_term_string}",
-        "query-input": "required name=search_term_string"
-      }
+      "url": "https://numerosenletras.org/"
     })} />
 
     {breadcrumbs && breadcrumbs.length > 0 && (
@@ -167,8 +163,8 @@ const breadcrumbs = getBreadcrumbs();
     <!-- ========================================== -->
   </head>
   <body class="min-h-screen flex flex-col bg-gray-50 text-gray-900 antialiased">
-    <!-- Navbar (Astro hydrates React component on the client) -->
-    <Navbar currentPath={currentPath} client:load />
+    <!-- Navbar (Static Astro component with lightweight mobile toggle script) -->
+    <Navbar currentPath={currentPath} />
 
     <!-- Main Content Area -->
     <main class="flex-1 pb-12">
@@ -202,9 +198,9 @@ const breadcrumbs = getBreadcrumbs();
       <!-- Content slot -->
       <slot />
 
-      <!-- Dynamic Interlinking Matrix -->
+      <!-- Dynamic Interlinking Matrix (Static Astro component) -->
       <div class="max-w-4xl mx-auto px-4 mt-8 sm:mt-12">
-        <InterlinkingMatrix currentPath={currentPath} client:load />
+        <InterlinkingMatrix currentPath={currentPath} />
       </div>
     </main>
 
@@ -267,7 +263,7 @@ const breadcrumbs = getBreadcrumbs();
       </div>
     </footer>
 
-    <!-- Client-side Cookie Banner -->
-    <CookieBanner client:load />
+    <!-- Client-side Cookie Banner (Lazy loaded on idle) -->
+    <CookieBanner client:idle />
   </body>
 </html>

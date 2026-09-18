@@ -26,6 +26,7 @@ import {
 interface CurrencyConfig {
   code: string;
   name: string;
+  singular: string;
   plural: string;
   centName: string;
   centPlural: string;
@@ -43,22 +44,22 @@ interface QuantityHistoryItem {
 }
 
 const CURRENCIES: CurrencyConfig[] = [
-  { code: "MXN", name: "Peso Mexicano", plural: "pesos", centName: "centavo", centPlural: "centavos", symbol: "$", suffix: "M.N." },
-  { code: "USD", name: "Dólar Americano", plural: "dólares", centName: "centavo", centPlural: "centavos", symbol: "$", suffix: "USD" },
-  { code: "EUR", name: "Euro", plural: "euros", centName: "céntimo", centPlural: "céntimos", symbol: "€", suffix: "" },
-  { code: "COP", name: "Peso Colombiano", plural: "pesos", centName: "centavo", centPlural: "centavos", symbol: "$", suffix: "M/CTE" },
-  { code: "PEN", name: "Sol Peruano", plural: "soles", centName: "céntimo", centPlural: "céntimos", symbol: "S/", suffix: "y CTS." },
-  { code: "ARS", name: "Peso Argentino", plural: "pesos", centName: "centavo", centPlural: "centavos", symbol: "$", suffix: "ARS" },
-  { code: "CLP", name: "Peso Chileno", plural: "pesos", centName: "centavo", centPlural: "centavos", symbol: "$", suffix: "CLP" },
-  { code: "VES", name: "Bolívar Venezolano", plural: "bolívares", centName: "céntimo", centPlural: "céntimos", symbol: "Bs.S", suffix: "V.S." },
-  { code: "BOB", name: "Boliviano", plural: "bolivianos", centName: "centavo", centPlural: "centavos", symbol: "Bs", suffix: "BOB" },
-  { code: "GTQ", name: "Quetzal Guatemalteco", plural: "quetzales", centName: "centavo", centPlural: "centavos", symbol: "Q", suffix: "GTQ" },
-  { code: "CRC", name: "Colón Costarricense", plural: "colones", centName: "céntimo", centPlural: "céntimos", symbol: "₡", suffix: "CRC" },
-  { code: "HNL", name: "Lempira Hondureño", plural: "lempiras", centName: "centavo", centPlural: "centavos", symbol: "L", suffix: "HNL" },
-  { code: "NIO", name: "Córdoba Nicaragüense", plural: "córdobas", centName: "centavo", centPlural: "centavos", symbol: "C$", suffix: "NIO" },
-  { code: "PYG", name: "Guaraní Paraguayo", plural: "guaraníes", centName: "centavo", centPlural: "centavos", symbol: "₲", suffix: "PYG" },
-  { code: "UYU", name: "Peso Uruguayo", plural: "pesos", centName: "centésimo", centPlural: "centésimos", symbol: "$U", suffix: "UYU" },
-  { code: "DOP", name: "Peso Dominicano", plural: "pesos", centName: "centavo", centPlural: "centavos", symbol: "RD$", suffix: "DOP" }
+  { code: "MXN", name: "Peso Mexicano", singular: "peso", plural: "pesos", centName: "centavo", centPlural: "centavos", symbol: "$", suffix: "M.N." },
+  { code: "USD", name: "Dólar Americano", singular: "dólar", plural: "dólares", centName: "centavo", centPlural: "centavos", symbol: "$", suffix: "USD" },
+  { code: "EUR", name: "Euro", singular: "euro", plural: "euros", centName: "céntimo", centPlural: "céntimos", symbol: "€", suffix: "" },
+  { code: "COP", name: "Peso Colombiano", singular: "peso", plural: "pesos", centName: "centavo", centPlural: "centavos", symbol: "$", suffix: "M/CTE" },
+  { code: "PEN", name: "Sol Peruano", singular: "sol", plural: "soles", centName: "céntimo", centPlural: "céntimos", symbol: "S/", suffix: "y CTS." },
+  { code: "ARS", name: "Peso Argentino", singular: "peso", plural: "pesos", centName: "centavo", centPlural: "centavos", symbol: "$", suffix: "ARS" },
+  { code: "CLP", name: "Peso Chileno", singular: "peso", plural: "pesos", centName: "centavo", centPlural: "centavos", symbol: "$", suffix: "CLP" },
+  { code: "VES", name: "Bolívar Venezolano", singular: "bolívar", plural: "bolívares", centName: "céntimo", centPlural: "céntimos", symbol: "Bs.S", suffix: "V.S." },
+  { code: "BOB", name: "Boliviano", singular: "boliviano", plural: "bolivianos", centName: "centavo", centPlural: "centavos", symbol: "Bs", suffix: "BOB" },
+  { code: "GTQ", name: "Quetzal Guatemalteco", singular: "quetzal", plural: "quetzales", centName: "centavo", centPlural: "centavos", symbol: "Q", suffix: "GTQ" },
+  { code: "CRC", name: "Colón Costarricense", singular: "colón", plural: "colones", centName: "céntimo", centPlural: "céntimos", symbol: "₡", suffix: "CRC" },
+  { code: "HNL", name: "Lempira Hondureño", singular: "lempira", plural: "lempiras", centName: "centavo", centPlural: "centavos", symbol: "L", suffix: "HNL" },
+  { code: "NIO", name: "Córdoba Nicaragüense", singular: "córdoba", plural: "córdobas", centName: "centavo", centPlural: "centavos", symbol: "C$", suffix: "NIO" },
+  { code: "PYG", name: "Guaraní Paraguayo", singular: "guaraní", plural: "guaraníes", centName: "centavo", centPlural: "centavos", symbol: "₲", suffix: "PYG" },
+  { code: "UYU", name: "Peso Uruguayo", singular: "peso", plural: "pesos", centName: "centésimo", centPlural: "centésimos", symbol: "$U", suffix: "UYU" },
+  { code: "DOP", name: "Peso Dominicano", singular: "peso", plural: "pesos", centName: "centavo", centPlural: "centavos", symbol: "RD$", suffix: "DOP" }
 ];
 
 const CURRENCY_INFO: Record<string, { flag: string, country: string }> = {
@@ -297,21 +298,19 @@ export default function QuantityWithLetter({ initialAmount }: { initialAmount?: 
 
     try {
       const formatted = convertNumberToLetters(cleanAmount, {
-        gender: 'N', // neutral "un mil" / "un peso" is standard for finance
-        isCurrency: true,
-        currencyName: selectedCurrency.plural,
-        currencyCentName: selectedCurrency.centPlural,
-        formatFinancial: isFinancialFormat
+        currency: {
+          code: selectedCurrency.code,
+          singular: selectedCurrency.singular,
+          plural: selectedCurrency.plural,
+          centSingular: selectedCurrency.centName,
+          centPlural: selectedCurrency.centPlural,
+          financialSuffix: selectedCurrency.suffix
+        },
+        formatFinancial: isFinancialFormat,
+        decimalMode: isFinancialFormat ? 'fraction' : 'words'
       });
 
-      let finalResult = formatted;
-      if (isFinancialFormat && selectedCurrency.suffix) {
-        if (!formatted.endsWith(selectedCurrency.suffix)) {
-          finalResult = formatted.replace("M.N.", selectedCurrency.suffix);
-        }
-      }
-
-      setResult(finalResult);
+      setResult(formatted);
     } catch (e) {
       setResult("Error en la conversión de importe");
     }
@@ -1242,11 +1241,11 @@ export default function QuantityWithLetter({ initialAmount }: { initialAmount?: 
             },
             {
               q: "¿Cómo se escribe una cantidad con letra para un cheque en dólares?",
-              a: "Para transacciones oficiales en dólares estadounidenses, se utiliza la cantidad en letras, seguida de la porción centenaria sobre cien y la sigla 'USD' o 'L.C.' (Moneda Legal). Por ejemplo: 'Un mil quinientos dólares 50/100 USD'."
+              a: "Para transacciones oficiales en dólares estadounidenses, se utiliza la cantidad en letras, seguida de la porción centenaria sobre cien y la sigla 'USD'. Por ejemplo: 'Mil quinientos dólares 50/100 USD'."
             },
             {
               q: "¿Es obligatorio poner 'un mil' o se puede escribir simplemente 'mil'?",
-              a: "Ortográficamente, escribir 'mil' es correcto y preferido por la RAE en el lenguaje ordinario. No obstante, en la emisión de cheques y documentos mercantiles, la práctica bancaria recomienda anteponer 'un mil' para evitar alteraciones fraudulentas (ej. que alguien agregue 'diez' o 'veinte' delante de la palabra 'mil')."
+              a: "Según la norma lingüística de la RAE, la forma correcta y recomendada es escribir 'mil' (ej. 'mil pesos' o 'mil dólares'). No obstante, en la práctica bancaria y notarial de algunos países se acostumbra escribir 'un mil' para dificultar adulteraciones manuales en cheques o pagarés."
             },
             {
               q: "¿Cómo se expresan los centavos en facturas y cheques?",
