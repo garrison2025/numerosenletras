@@ -1,0 +1,31 @@
+name: One-time Bun lockfile reconciliation
+on:
+  push:
+    branches:
+      - resource/spanish-number-spelling-worksheet-20261012
+    paths:
+      - .github/workflows/reconcile-bun-lock.yml
+permissions:
+  contents: write
+jobs:
+  reconcile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: Reconcile lockfile with current package.json
+        run: bun install
+      - name: Commit only refreshed Bun lock
+        run: |
+          git add bun.lock
+          if git diff --cached --quiet; then
+            echo "Lockfile already matched"
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m "chore: sync bun.lock with current package.json"
+          git push origin HEAD:resource/spanish-number-spelling-worksheet-20261012
