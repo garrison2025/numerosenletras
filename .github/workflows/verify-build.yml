@@ -1,0 +1,31 @@
+name: Verify Astro production build
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: Install locked dependencies
+        run: bun install --frozen-lockfile
+      - name: Build production site
+        run: bun run build
+      - name: Confirm deployed educational HTML asset
+        run: |
+          if [ -f public/recursos/ficha-numeros-escritos.html ]; then
+            test -s dist/recursos/ficha-numeros-escritos.html
+            grep -q 'Solucionario' dist/recursos/ficha-numeros-escritos.html
+            grep -q 'numerosenletras.org' dist/recursos/ficha-numeros-escritos.html
+          fi
